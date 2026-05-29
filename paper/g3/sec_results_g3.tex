@@ -150,42 +150,9 @@ counterparts without making them beat well-regularized linear models on these
 benchmarks.
 
 \subsection{Robustness under difficult splits}\label{sec:res-splits}
-The advantage of correlation training is contingent on the generalization regime
-(\texttt{splits\_summary.csv}), but the evidence here is markedly thinner than in
-the main grid: the leave-family-out (SoyNAM) and random contrasts each rest on
-only $n=4$ datasets with no $p$-values reported, and the cross-environment
-contrast rests on $n=12$ paired comparisons that are themselves non-independent
-($4$ wheat environments yield $12$ ordered transfer pairs on the same $599$
-lines). A further structural limitation is that every splits loss-contrast here
-comes from the MLP: in the splits experiment the CNN was run only with the Pearson
-loss and had no MSE baseline, so a $\Delta$-vs-MSE could be formed for the MLP
-alone --- the architecture with the \emph{smallest} benefit under random CV. The
-splits contrasts therefore most likely understate the CNN and Transformer effect.
-These results should therefore be read as suggestive and underpowered
-rather than confirmatory. Under random $K$-fold CV the Pearson loss gives a small
-gain in predictive ability ($\Delta r=+0.0041$, percentile-bootstrap CI $[0.0004,\,0.0080]$;
-the splits CIs at $n=4$ use the percentile bootstrap, not BCa --- see Methods),
-matched by the hybrid loss ($+0.0040$, $[0.0009,\,0.0072]$). Under the harder,
-breeding-relevant schemes the gain shrinks or reverses. For SoyNAM
-leave-family-out prediction the Pearson loss \emph{lowers} predictive ability
-($\Delta r=-0.0030$, $[-0.0106,\,0.0010]$) and the family NDCG@$10$ contrast is
-negative with a percentile-bootstrap interval that excludes zero ($-0.0042$, $[-0.0089,\,-0.0005]$);
-we describe this as a suggestive degradation rather than a significant one, since
-it is a single bootstrap interval over $4$ paired observations with no $p$-value
-and no correction across the roughly twenty split contrasts examined. The hybrid
-loss behaves similarly on family overlap@$10$ ($-0.019$, $[-0.037,\,-0.0004]$).
-For CIMMYT wheat cross-environment transfer the picture is genuinely ambiguous:
-the Pearson-loss $\Delta r=+0.0098$ has a BCa interval that just excludes zero
-($[0.0001,\,0.0204]$), yet the discrete paired Wilcoxon test on the same $12$
-non-independent pairs returns $p=0.151$. At this $n$ the interval and the rank
-test disagree, and we report both rather than asserting one verdict; there is no
-accompanying NDCG@$10$ benefit ($-0.0012$, $p=0.97$), and the within-environment
-contrast is slightly negative ($\Delta r=-0.0069$). The practical implication is
-that the case for a correlation-consistent loss is clearest under random CV and
-weakest exactly where breeders most need generalization, across families and
-environments; but with this few independent hard splits the directional reads are
-tentative, and the loss should be validated per program rather than assumed to
-transfer.
+The advantage of correlation-consistent training is contingent on the generalization regime (\texttt{splits\_summary.csv}). We re-ran all three neural architectures with an MSE baseline under each scheme, so the loss contrasts below cover the CNN and Transformer as well as the MLP; the evidence nonetheless remains far thinner than the main grid --- the SoyNAM random and leave-family-out contrasts and the wheat within-environment contrast each pool $n=12$ (dataset,\,model) cells, and the cross-environment contrast pools $n=36$ ordered transfer pairs that are non-independent (four wheat environments on the same $599$ lines). These results are therefore suggestive and underpowered rather than confirmatory.
+
+Under random $K$-fold CV the benefit persists and, as in the main grid, is largest for the harder-to-train architectures. Pooled over architectures, the CCC loss raises Pearson by $+0.025$ (BCa CI $[0.012,\,0.054]$, $p_{\mathrm{Holm}}=0.006$), the hybrid by $+0.019$ ($[0.007,\,0.043]$) and the Pearson loss by $+0.016$ ($[0.003,\,0.042]$); the Transformer alone gains $\Delta r=+0.025$ ($[0.013,\,0.034]$) under random SoyNAM CV and $+0.063$ ($[0.029,\,0.100]$) within wheat environments. Under the harder, breeding-relevant schemes the gain disappears across \emph{every} architecture: for SoyNAM leave-family-out prediction the pooled Pearson-loss $\Delta r=-0.006$ ($[-0.017,\,0.004]$) and for wheat cross-environment transfer $\Delta r=-0.002$ ($[-0.011,\,0.007]$), with every interval spanning zero and all Holm-corrected $p$-values equal to one; the per-architecture deltas agree --- none of the MLP, CNN or Transformer shows a reliable gain under family or environment structure. The practical implication is that the case for a correlation-consistent loss is clearest under random CV and weakest exactly where breeders most need generalization, across families and environments; with this few independent hard splits the directional reads are tentative, and the loss should be validated per breeding program rather than assumed to transfer.
 
 \subsection{Batch size and optimization stability}\label{sec:res-batch}
 Proposition~\ref{prop:3} predicts that the mini-batch Pearson loss is a biased

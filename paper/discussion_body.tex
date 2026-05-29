@@ -205,30 +205,28 @@ reporting the quantity it actually cares about.
 \subsection{Robustness under difficult splits is, at best, suggestive}
 We probed whether the benefit survives harder generalization regimes
 (leave-family-out on SoyNAM, cross-environment transfer on CIMMYT wheat,
-within-environment, and random $K$-fold) in a separate experiment. The honest
-summary is that the gain weakens, and in places reverses, under hard splits, and
-that the evidence base for these directional statements is thin and should be read
-as suggestive rather than confirmatory. The leave-family-out, random and
-within-environment contrasts each rest on only $n=4$ datasets with no $p$-values,
-and the cross-environment contrast on $n=12$ \emph{ordered} environment pairs
-derived from the same four environments on the same $599$ wheat lines, which are
-not mutually independent; no multiple-testing correction is applied across the
-roughly twenty split contrasts examined. With those caveats stated plainly: under
-leave-family-out CV the Pearson-loss predictive gain is essentially absent
-($\Delta r = -0.0030$, $[-0.0106,0.0010]$) and selection quality is, if anything,
-slightly degraded ($\Delta$NDCG@10 $=-0.0042$, percentile-bootstrap CI $[-0.0089,-0.0005]$
-excluding zero) --- but this CI is bootstrapped over four paired cells with no
-$p$-value, so we read it as a suggestive signal of weakened benefit, not as
-established significant degradation. Under cross-environment transfer the
-predictive change is small and its inferential status is genuinely ambiguous: the
-point estimate is $\Delta r=+0.0098$ with a BCa CI of $[0.0001,0.0204]$ that
-narrowly excludes zero, yet the paired Wilcoxon test is non-significant
-($p=0.151$). At $n=12$ the discrete signed-rank test and the bootstrap CI simply
-disagree, and we do not resolve the disagreement in either direction; the
-cross-environment selection metric shows no benefit ($\Delta$NDCG@10 $=-0.0012$,
-$p=0.97$). The practically defensible reading is that the loss benefit is clearest
-under random partitioning and is not demonstrated to carry over to family- or
-environment-level extrapolation on the limited hard splits available here.
+within-environment, and random $K$-fold) in a separate experiment, re-run so that
+all three neural architectures (CNN, Transformer and MLP) carry an MSE baseline
+under every scheme and the loss contrasts therefore cover each architecture. The
+honest summary is that the gain holds under random and within-environment CV but
+attenuates to zero under family- and environment-structured splits across every
+architecture, and that the evidence base for these directional statements remains
+thin. The SoyNAM random, leave-family-out and wheat within-environment contrasts
+each pool $n=12$ (dataset,\,model) cells, and the cross-environment contrast pools
+$n=36$ \emph{ordered} environment pairs derived from the same four environments on
+the same $599$ wheat lines, which are not mutually independent. With those caveats
+stated plainly: under random $K$-fold CV the benefit persists and is largest for
+the harder-to-train architectures, mirroring the main grid (pooled CCC $\Delta r =
++0.025$, BCa CI $[0.012,0.054]$, $p_{\mathrm{Holm}}=0.006$; the Transformer alone
+$+0.025$ under random SoyNAM CV and $+0.063$ within wheat environments). Under the
+harder, breeding-relevant schemes the gain disappears across every architecture:
+the pooled Pearson-loss $\Delta r=-0.006$ ($[-0.017,0.004]$) for leave-family-out
+and $-0.002$ ($[-0.011,0.007]$) for cross-environment transfer, with every interval
+spanning zero and all Holm-corrected $p$-values equal to one, and none of the MLP,
+CNN or Transformer showing a reliable gain under family or environment structure.
+The practically defensible reading is that the loss benefit is clearest under random
+partitioning and is not demonstrated to carry over to family- or environment-level
+extrapolation on the limited hard splits available here.
 
 \subsection{Recommendations for breeders and practitioners}
 We distil the above into concrete, defensible guidance.
@@ -304,17 +302,16 @@ between structured and random splitting --- and we therefore do not include a sc
 term in the mixed model. The leave-family-out and cross-environment contrasts are
 not levels of this factor and are estimated only in the separate splits experiment,
 which ---
-as discussed above --- suggests the benefit weakens or reverses under family- and
-environment-level extrapolation rather than persisting. Moreover, every splits
-loss-contrast is computed on the MLP alone --- in the splits experiment the CNN was
-run only with the Pearson loss and so has no MSE baseline from which to form a
-$\Delta$ --- and the MLP is precisely the architecture with the smallest random-CV
-benefit, so these hard-split contrasts likely understate the CNN and Transformer
-effect and should be read as suggestive. The number of genuinely
-independent hard splits is small ($n=4$ families, $n=12$ non-independent
-environment pairs), and establishing whether correlation-consistent training helps
-under realistic structured prediction will require substantially more, and more
-independent, hard-split data. Finally, our networks did not beat the linear
+as discussed above --- shows the benefit attenuating to zero under family- and
+environment-level extrapolation rather than persisting. The hard-split experiment
+now covers all three architectures (CNN, Transformer and MLP), each with its own
+MSE baseline, and the attenuation under family and environment structure holds
+across every one of them, so the remaining limitation is statistical power rather
+than architecture coverage: the number of genuinely independent hard splits is
+small ($n=12$ pooled cells per scheme, $n=36$ non-independent environment pairs),
+and establishing whether correlation-consistent training helps under realistic
+structured prediction will require substantially more, and more independent,
+hard-split data. Finally, our networks did not beat the linear
 baselines, so the practical ceiling on the value of any loss here is bounded by the
 predictors that benefit from it.
 

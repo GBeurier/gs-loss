@@ -194,50 +194,98 @@ def run_batch(cfg, hpo, gpus, streams, serial=False):
 
 # --- Exp F: realistic splits -------------------------------------------------
 
-def run_splits(cfg, hpo, gpus, streams, serial=False):
+def _split_specs(cfg):
+    """Full grid for the split study: classical baselines + every neural
+    architecture under every core loss (so Delta-vs-MSE is defined for ALL
+    architectures, not just the MLP)."""
+    return ([("gblup", "na"), ("ridge", "na")]
+            + [(a, l) for a in ("mlp", "cnn", "transformer") for l in cfg.losses])
+
+
+def run_split_payload(payload):
+    """Run one (dataset, trait/env-pair, scheme) split cell over the full grid."""
+    cfg = GridConfig(**payload["cfg"])
+    hpo = payload["hpo"]
+    key = payload["key"]
+    ds = make_dataset(key, cfg)
+    pm = hpo[key]["params"]
+    scheme = payload["scheme"]
     rows = []
-    # soybean NAM: random vs leave-family-out
-    for trait in cfg.soynam_traits:
-        key = f"soynam:{trait}"
-        ds = make_dataset(key, cfg)
-        pm = hpo[key]["params"]
+    if payload["kind"] == "cell":
+        trait = payload["trait"]
         X, y, ids, groups = ds.get_xy(trait)
-        schemes = {"random": repeated_kfold(len(y), 5, cfg.n_repeats, seed=cfg.seed),
-                   "family": leave_family_out(groups, min_test=5,
-                                              max_families=cfg.soynam_max_families, seed=cfg.seed)}
-        for scheme, splits in schemes.items():
-            for m, loss in [("gblup", "na"), ("ridge", "na"),
-                            ("mlp", "mse"), ("mlp", "pearson"), ("mlp", "hybrid"),
-                            ("cnn", "pearson")]:
-                p = _nn_params(pm.get(m, {}), loss, cfg) if m not in CLASSICAL else pm.get(m, {})
-                r = run_cell(ds, trait, m, loss, splits, params=p, fracs=cfg.fracs,
-                             cal_names=cfg.calibrators,
-                             base_meta={"exp": "splits", "split_type": scheme}, seed=cfg.seed)
-                rows += r
-        print(f"[splits] soynam:{trait} done", flush=True)
-    # wheat: within-environment random vs cross-environment transfer
-    wk = "wheat:_"
-    ds = make_dataset(wk, cfg)
-    pm = hpo[wk]["params"]
-    envs = ds.trait_names
-    for trait in envs:                              # within-env random CV
-        splits = repeated_kfold(len(ds.traits[trait]), 5, cfg.n_repeats, seed=cfg.seed)
-        for m, loss in [("gblup", "na"), ("mlp", "mse"), ("mlp", "pearson"), ("cnn", "pearson")]:
+        if scheme == "family":
+            splits = leave_family_out(groups, min_test=5,
+                                      max_families=cfg.soynam_max_families, seed=cfg.seed)
+        else:                                       # random / within_env
+            splits = repeated_kfold(len(y), 5, cfg.n_repeats, seed=cfg.seed)
+        for m, loss in _split_specs(cfg):
             p = _nn_params(pm.get(m, {}), loss, cfg) if m not in CLASSICAL else pm.get(m, {})
             rows += run_cell(ds, trait, m, loss, splits, params=p, fracs=cfg.fracs,
                              cal_names=cfg.calibrators,
-                             base_meta={"exp": "splits", "split_type": "within_env"}, seed=cfg.seed)
-    for ea in envs:                                 # cross-env transfer
-        for eb in envs:
-            if ea == eb:
-                continue
-            splits = repeated_kfold(len(ds.traits[ea]), 5, max(1, cfg.n_repeats // 2), seed=cfg.seed)
-            for m, loss in [("gblup", "na"), ("mlp", "mse"), ("mlp", "pearson"), ("cnn", "pearson")]:
-                p = _nn_params(pm.get(m, {}), loss, cfg) if m not in CLASSICAL else pm.get(m, {})
-                rows += run_cross_env(ds, ea, eb, m, loss, splits, params=p,
-                                      fracs=cfg.fracs, cal_names=cfg.calibrators, seed=cfg.seed)
-    print("[splits] wheat done", flush=True)
+                             base_meta={"exp": "splits", "split_type": scheme}, seed=cfg.seed)
+    else:                                           # cross-environment transfer
+        ea, eb = payload["ea"], payload["eb"]
+        splits = repeated_kfold(len(ds.traits[ea]), 5, cfg.n_repeats, seed=cfg.seed)
+        for m, loss in _split_specs(cfg):
+            p = _nn_params(pm.get(m, {}), loss, cfg) if m not in CLASSICAL else pm.get(m, {})
+            rows += run_cross_env(ds, ea, eb, m, loss, splits, params=p,
+                                  fracs=cfg.fracs, cal_names=cfg.calibrators, seed=cfg.seed)
     return pd.DataFrame(rows)
+
+
+def run_splits(cfg, hpo, gpus, streams, serial=False, hpo_path=None):
+    """Exp F across all architectures, parallelized over GPUs. SoyNAM random vs
+    leave-family-out; wheat within- vs cross-environment."""
+    from ccgp.hpo import _representative_trait, tune_model
+    split_keys = [f"soynam:{t}" for t in cfg.soynam_traits] + ["wheat:_"]
+    changed = False
+    for key in split_keys:                          # ensure Transformer is tuned for these datasets
+        if "transformer" not in hpo[key]["params"]:
+            ds = make_dataset(key, cfg)
+            trait = hpo[key].get("trait") or _representative_trait(ds)
+            X, y, _, _ = ds.get_xy(trait)
+            print(f"[splits-hpo] transformer {key}", flush=True)
+            hpo[key]["params"]["transformer"] = tune_model(X, y, "transformer",
+                                                           cfg.hpo_trials, cfg.hpo_folds, cfg.seed)
+            changed = True
+    if changed and hpo_path:
+        Path(hpo_path).write_text(json.dumps(hpo, indent=1))
+
+    cfgd = asdict(cfg)
+    payloads = []
+    for t in cfg.soynam_traits:
+        for scheme in ("random", "family"):
+            payloads.append({"kind": "cell", "key": f"soynam:{t}", "trait": t,
+                             "scheme": scheme, "cfg": cfgd, "hpo": hpo})
+    wk = "wheat:_"
+    envs = list(make_dataset(wk, cfg).trait_names)
+    for env in envs:
+        payloads.append({"kind": "cell", "key": wk, "trait": env,
+                         "scheme": "within_env", "cfg": cfgd, "hpo": hpo})
+    for ea in envs:
+        for eb in envs:
+            if ea != eb:
+                payloads.append({"kind": "crossenv", "key": wk, "ea": ea, "eb": eb,
+                                 "scheme": "cross_env", "cfg": cfgd, "hpo": hpo})
+
+    shards = []
+    if serial:
+        for i, pl in enumerate(payloads):
+            shards.append(run_split_payload(pl))
+            print(f"[splits] {i+1}/{len(payloads)} done", flush=True)
+    else:
+        n_workers = len(gpus) * streams
+        ctx = mp.get_context("spawn")
+        q = ctx.Queue()
+        for i in range(n_workers):
+            q.put(gpus[i % len(gpus)])
+        with ProcessPoolExecutor(n_workers, mp_context=ctx, initializer=_gpu_init, initargs=(q,)) as ex:
+            futs = {ex.submit(run_split_payload, pl): pl for pl in payloads}
+            for i, fut in enumerate(as_completed(futs)):
+                shards.append(fut.result())
+                print(f"[splits] {i+1}/{len(futs)} done", flush=True)
+    return pd.concat(shards, ignore_index=True)
 
 
 # --- CLI ---------------------------------------------------------------------
@@ -272,7 +320,8 @@ def main():
         df.to_parquet(RESULTS / f"results_batch_{cfg.name}.parquet")
         print(f"[batch] wrote {len(df)} rows")
     if args.cmd in ("splits", "all"):
-        df = run_splits(cfg, hpo, gpus, args.streams, serial=args.serial)
+        df = run_splits(cfg, hpo, gpus, args.streams, serial=args.serial,
+                        hpo_path=RESULTS / f"hpo_{cfg.name}.json")
         df.to_parquet(RESULTS / f"results_splits_{cfg.name}.parquet")
         print(f"[splits] wrote {len(df)} rows")
 
