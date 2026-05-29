@@ -19,6 +19,12 @@ objective. The identity is elementary; what these checks establish is that it
 yields a usable, numerically stable training target.
 
 \subsection{Same architecture, different loss}\label{sec:res-loss}
+
+\begin{figure}[tbp]\centering
+\IfFileExists{figures/fig4_loss_comparison.pdf}{\includegraphics[width=\linewidth]{figures/fig4_loss_comparison.pdf}}{}
+\caption{Loss comparison: $\Delta$ versus MSE for Pearson, hybrid and CCC losses.}
+\label{fig:loss}
+\end{figure}
 Holding the architecture, splits and tuned hyper-parameters fixed so that only
 the loss changes, every correlation-based loss improves predictive ability over
 MSE on average (Figure~\ref{fig:loss}). Pooling all $n=251$ (loss, model,
@@ -73,6 +79,12 @@ correlation, most for weaker-optimizing architectures, but only the CCC loss
 improves phenotypic-scale error.
 
 \subsection{Calibration effects}\label{sec:res-calibration}
+
+\begin{figure}[tbp]\centering
+\IfFileExists{figures/fig5_calibration.pdf}{\includegraphics[width=\linewidth]{figures/fig5_calibration.pdf}}{}
+\caption{Affine calibration restores scale and offset while leaving Pearson unchanged.}
+\label{fig:calibration}
+\end{figure}
 Applying the post-hoc maps of Proposition~\ref{prop:2} to the Pearson-trained
 networks behaves as the theory predicts in the mean (Figure~\ref{fig:calibration}).
 The mean Pearson correlation is essentially unchanged before and after affine
@@ -198,6 +210,12 @@ intended global objective and removes a source of avoidable mini-batch noise
 without materially increasing cost.
 
 \subsection{When does correlation-consistent training help?}\label{sec:res-meta}
+
+\begin{figure}[tbp]\centering
+\IfFileExists{figures/fig6_meta.pdf}{\includegraphics[width=\linewidth]{figures/fig6_meta.pdf}}{}
+\caption{When does correlation-consistent training help?}
+\label{fig:meta}
+\end{figure}
 A confirmatory linear mixed model, fitted on the affine-calibrated predictions
 with MSE as the reference level and random intercepts for dataset and
 dataset:trait, summarizes the average effect of each loss
