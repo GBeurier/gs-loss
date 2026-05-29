@@ -99,7 +99,7 @@ mini-batch Pearson loss is a biased surrogate for the global objective and
 quantify the effect of batch size empirically.
 \item \textbf{A reproducible, selection-aware benchmark
 (Sections~\ref{sec:methods}--\ref{sec:results}).} Across \NUM{101}
-trait--datasets from \NUM{12} species, with architecture, splits and tuning held
+trait--datasets from \NUM{12} panels/sources spanning 10 species, with architecture, splits and tuning held
 fixed so that only the loss changes, we report both predictive and
 selection-oriented metrics, a confirmatory mixed-model analysis, and a
 meta-analysis of \emph{when} correlation-consistent training helps. All data are
@@ -210,7 +210,7 @@ Proposition~\ref{prop:3}, neither variant equals the pooled global correlation.
 \section{Materials and Methods}\label{sec:methods}
 
 \paragraph{Datasets.} We use three public sources, for a total of \NUM{101}
-trait--dataset combinations across \NUM{12} species. (i) \emph{EasyGeSe}
+trait--dataset combinations across \NUM{12} panels/sources spanning 10 species. (i) \emph{EasyGeSe}
 \citep{quesada2025easygese}: a benchmark of ten species (barley, common bean,
 lentil, maize, eastern oyster, pig, loblolly pine, rice, soybean and wheat)
 providing genotypes, phenotypes and \emph{fixed} cross-validation partitions; the
@@ -316,7 +316,10 @@ scheme is confounded with dataset source; difficult-split generalization is
 addressed directly in Section~\ref{sec:res-splits}.)
 
 \paragraph{Implementation.} The framework is released as the Python package
-\texttt{ccgp} (PyTorch, scikit-learn, XGBoost), with fixed seeds, the exact CV
+\texttt{ccgp}, built on PyTorch \citep{paszke2019pytorch}, scikit-learn
+\citep{pedregosa2011sklearn}, XGBoost \citep{chen2016xgboost} and NumPy
+\citep{harris2020numpy}, with the neural networks trained using the Adam optimizer
+\citep{kingma2015adam}, fixed seeds, the exact CV
 partitions, tuned configurations and a pinned environment. \emph{Limitation:}
 hyper-parameters are tuned on full-data validation splits with a neutral MSE
 objective and frozen across losses; because the architecture is shared
@@ -343,8 +346,8 @@ on mean rank. The framework is thus a principled, well-characterized tool to be
 applied judiciously, not a universal replacement for MSE.
 
 \section*{Data and code availability}
-All datasets are public: EasyGeSe (Zenodo record 15348871), the CIMMYT wheat panel
-(\texttt{BGLR} R package) and SoyNAM (\texttt{SoyNAM} R package). Code, fixed
+All datasets are public: EasyGeSe (Zenodo, DOI \texttt{10.5281/zenodo.15348871}), the CIMMYT wheat panel
+(\texttt{BGLR} R package \citep{perez2014bglr}) and SoyNAM (\texttt{SoyNAM} R package). Code, fixed
 cross-validation partitions, tuned configurations and a pinned environment are
 released as the \texttt{ccgp} package, with source at
 \url{https://github.com/GBeurier/selgen-loss} (a versioned archive will be

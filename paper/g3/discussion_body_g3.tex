@@ -32,7 +32,7 @@ rather than a formal novelty.
 Our central empirical message is deliberately unromantic. Training a neural
 genomic predictor with the standardized-MSE Pearson loss instead of MSE does
 move predictive ability in the right direction --- pooled across the
-\NUM{251} loss--model cells the mean improvement is $\Delta r = +0.038$ (BCa 95\%
+\NUM{251} (dataset, trait, model) cells (one $\Delta$-vs-MSE per cell, per loss) the mean improvement is $\Delta r = +0.038$ (BCa 95\%
 CI $[0.028,0.050]$, $p_{\mathrm{Holm}}=1.2\times10^{-8}$), with matching gains in
 Spearman $\rho$ ($+0.037$, $[0.028,0.048]$) and in NDCG@10 ($+0.016$,
 $[0.011,0.021]$) --- but it is not the best loss, and the gain is concentrated in
@@ -118,14 +118,18 @@ difference is noise). The fitted affine slope $a^\star=\mathrm{cov}(y,p)/
 \mathrm{var}(p)$ is estimated on validation data, so the rank-preservation
 guarantee of Proposition~\ref{prop:2} holds only when $a^\star>0$. This is the
 case for almost every cell (the mean affine slope is $+2.27$), but it is not
-universal: in fewer than $1\%$ of folds ($90$ of $9{,}943$, $0.91\%$) a negative
-validation covariance produces a decreasing map on test, flipping the sign of the
-per-fold Pearson, with per-fold raw-versus-affine differences as large as $0.89$ in
-the worst cases. We therefore qualify the theoretical statement: a strictly
-increasing affine map ($a^\star>0$) preserves every correlation-type and
-rank-based statistic exactly, and because $a^\star>0$ in over $99\%$ of folds the
-correlation is preserved on average; the categorical phrasing that it
-\emph{must} be preserved holds only conditionally on $a^\star>0$. Isotonic
+universal: pooling all four neural-network losses, in $0.90\%$ ($<1\%$) of folds
+($90$ of $9{,}943$ --- the $10{,}040$ NN affine fold-rows minus $97$ folds with
+undefined raw or affine $r$) a negative validation covariance produces a
+decreasing map on test, flipping the sign of the per-fold Pearson, with per-fold
+raw-versus-affine differences as large as $0.89$ in the worst cases. Most of these
+flips come from the MSE folds ($66$ of $90$); for the Pearson loss specifically the
+rate is only $8$ of $2{,}486$ ($0.32\%$). We therefore qualify the theoretical
+statement: a strictly increasing affine map ($a^\star>0$) preserves every
+correlation-type and rank-based statistic exactly, and because the test $r$-sign is
+preserved in over $99\%$ of folds the correlation is preserved on average; the
+categorical phrasing that it \emph{must} be preserved holds only conditionally on
+$a^\star>0$. Isotonic
 calibration is marginally worse on $r$ ($0.516$). Isotonic regression is monotone
 non-decreasing by construction (its mean fitted slope is $+0.76$), so the loss of
 correlation is \emph{not} due to non-monotonicity; it arises because the isotonic
@@ -146,19 +150,27 @@ $\Delta\mathrm{RMSE}=-0.010$ with a BCa CI that crosses zero ($[-0.055,0.079]$).
 The paired Wilcoxon test is nominally significant ($p_{\mathrm{Holm}}=0.0049$), but
 this is a sign/median statement, not a magnitude one --- the signed-rank test
 detects a consistent direction in the per-cell differences while the mean effect
-and its CI are indistinguishable from zero. We do not interpret this as an RMSE
-improvement. The hybrid loss is similar (point estimate $+0.006$, CI
+and its CI are indistinguishable from zero. We do not interpret this pooled effect as an RMSE
+improvement. The hybrid loss is similar in the pool (point estimate $+0.006$, CI
 $[-0.041,0.097]$ spanning zero with a worse sign; $p_{\mathrm{Holm}}=1.5\times
 10^{-4}$ again reflects only a weak directional regularity, not a meaningful change
-in magnitude), and is in fact worse for the CNN ($+0.080$) while better only for
-the Transformer ($-0.119$). Only the CCC loss --- which penalizes scale and offset
-\emph{inside} the objective rather than after it --- delivers a consistent pooled
-calibrated-RMSE reduction ($-0.057$, $[-0.133,-0.027]$, CI excluding zero), and
-even that is driven by the CNN and Transformer. The confirmatory model agrees that
-the Pearson-loss effect on calibrated RMSE is null ($-0.010$, $t=-0.15$, CI
-spanning zero). In short, once predictions are correctly calibrated, the choice of
-correlation loss buys ranking quality, not magnitude accuracy; if calibrated
-magnitude is the explicit goal, the CCC loss is the better starting point.
+in magnitude), and is in fact worse for the CNN ($+0.080$). The pooled nulls,
+however, mask a clear \emph{per-architecture} exception: on the Transformer both
+the Pearson and the hybrid loss reliably lower calibrated RMSE (Pearson $-0.090$,
+$[-0.153,-0.050]$; hybrid $-0.119$, $[-0.247,-0.061]$, both CIs excluding zero), so
+the ``only CCC'' verdict holds only pooled, not for the Transformer. Among the
+losses only CCC --- which penalizes scale and offset \emph{inside} the objective
+rather than after it --- lowers pooled calibrated RMSE by a per-cell bootstrap
+interval that excludes zero ($-0.057$, $[-0.133,-0.027]$), and even that is driven
+by the CNN and Transformer. This CCC reduction is, however, supported by the
+per-cell bootstrap but \emph{not} corroborated by the cell-level mixed model: the
+confirmatory RMSE LMM nulls the CCC effect just as it nulls the Pearson and hybrid
+effects (CCC $-0.0565$, $t=-0.83$, CI $[-0.190,0.077]$ crossing zero; Pearson
+$-0.010$, $t=-0.15$; hybrid $+0.006$; all spanning zero). In short, once
+predictions are correctly calibrated, the choice of correlation loss buys ranking
+quality, not magnitude accuracy; if calibrated magnitude is the explicit goal, the
+CCC loss is the better starting point, but its calibrated-RMSE advantage should be
+read as suggestive rather than firmly established.
 
 \subsection{Selection quality requires top-$k$ and ranking metrics, and it is
 noisier than $r$}
@@ -227,20 +239,23 @@ neutral and not worth the change.
 scale.} If the deliverable is a ranking, raw correlation-trained outputs suffice;
 if it is a breeding value, an RMSE, or anything compared against measured
 phenotypes, apply the closed-form affine map fit on held-out data. It preserves
-the ranking exactly whenever the fitted slope is positive (over $99\%$ of folds)
-and is free.
+the ranking exactly whenever the fitted slope is positive, so the test $r$-sign is
+preserved in over $99\%$ of folds, and is free.
 \item \textbf{Report selection-aware metrics alongside $r$.} At minimum report
 NDCG@$k$ and relative efficiency (or top-$k$ overlap) at the selection intensities
 the program actually uses (here $k\in\{5,10,15,20\}\%$). Treat selection
 differential as informative but high-variance.
 \item \textbf{Prefer the CCC loss when calibrated scale and ranking both matter.}
 Among the objectives tested, the CCC loss was the \emph{only} one to reduce pooled
-calibrated RMSE (CI excluding zero) while matching the other correlation-aware
-losses on ranking, giving a single training run that serves both magnitude and
-selection use-cases. The hybrid loss did \emph{not} reliably improve pooled
-calibrated RMSE (point estimate $+0.006$, CI crossing zero); it lowered RMSE only
-for the Transformer and worsened it for the CNN, so its calibrated-RMSE benefit
-should not be generalized.
+calibrated RMSE with a per-cell bootstrap interval excluding zero while matching the
+other correlation-aware losses on ranking, giving a single training run that serves
+both magnitude and selection use-cases; this CCC advantage is, however, supported by
+the bootstrap but not corroborated by the cell-level mixed model (which nulls it),
+so treat it as suggestive. Per architecture, the picture differs: on the Transformer
+both the Pearson and the hybrid loss reliably lowered calibrated RMSE (Pearson
+$-0.090$, hybrid $-0.119$, both CIs excluding zero), whereas pooled neither did, and
+the hybrid loss worsened RMSE for the CNN ($+0.080$), so a calibrated-RMSE benefit
+should not be generalized across architectures.
 \item \textbf{Do not expect a loss change to substitute for a better model.}
 On additive, marker-dense traits the linear baselines remained ahead of all
 neural variants; the loss is a refinement, not a replacement for sound model
@@ -275,16 +290,15 @@ largest per-architecture effect attaching to the smaller Transformer subset.
 Third, the most breeding-relevant metric, the selection differential, is estimated
 with high variance from few top individuals per fold, and larger panels or pooled
 multi-fold estimators would sharpen it. Fourth, our evidence on harder
-generalization regimes is limited. We caution against over-reading the LMM:
-its \emph{scheme} factor has only two levels, ``predefined'' (the ten EasyGeSe
-species, their native five-fold CV partitions) and ``random'' ($K$-fold on SoyNAM
-and CIMMYT wheat), so it is fully confounded with dataset source and the
-$\beta_{\mathrm{random}}=+0.072$ ($[-0.151,0.296]$) coefficient contrasts those
-two dataset groups, \emph{not} structured-versus-random splitting; moreover it is a
-main effect on the absolute metric, not a loss$\times$scheme interaction, so a null
-$\beta_{\mathrm{random}}$ says nothing about whether the loss benefit persists
-across schemes. The leave-family-out and cross-environment contrasts are not levels
-of this factor and are estimated only in the separate splits experiment, which ---
+generalization regimes is limited. We caution against over-reading the LMM with
+respect to split strategy: a split \emph{scheme} factor has only two levels here,
+``predefined'' (the ten EasyGeSe species, their native five-fold CV partitions) and
+``random'' ($K$-fold on SoyNAM's four traits and CIMMYT wheat), so it is fully
+confounded with dataset source --- a contrast between two dataset groups, \emph{not}
+between structured and random splitting --- and we therefore do not include a scheme
+term in the mixed model. The leave-family-out and cross-environment contrasts are
+not levels of this factor and are estimated only in the separate splits experiment,
+which ---
 as discussed above --- suggests the benefit weakens or reverses under family- and
 environment-level extrapolation rather than persisting. The number of genuinely
 independent hard splits is small ($n=4$ families, $n=12$ non-independent

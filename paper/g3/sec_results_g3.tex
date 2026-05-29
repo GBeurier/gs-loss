@@ -21,8 +21,8 @@ yields a usable, numerically stable training target.
 \subsection{Same architecture, different loss}\label{sec:res-loss}
 Holding the architecture, splits and tuned hyper-parameters fixed so that only
 the loss changes, every correlation-based loss improves predictive ability over
-MSE on average (Figure~\ref{fig:loss}). Pooling all $n=251$ (loss, model,
-dataset) cells, the affine-calibrated Pearson loss raises the Pearson correlation
+MSE on average (Figure~\ref{fig:loss}). Pooling all $n=251$ (dataset, trait, model)
+cells --- one $\Delta$-vs-MSE per cell, per loss --- the affine-calibrated Pearson loss raises the Pearson correlation
 by $\Delta r = +0.038$ (BCa 95\% CI $[0.028,\,0.050]$; Holm-corrected paired
 Wilcoxon $p=1.2\times10^{-8}$), the hybrid loss by $+0.041$ ($[0.031,\,0.052]$;
 $p_{\mathrm{Holm}}=4.4\times10^{-11}$), and the CCC loss by $+0.044$
@@ -221,21 +221,20 @@ rely on the CIs.
 
 Two structural caveats bound the model's interpretation. First, the
 \texttt{model} terms are additive \emph{main} effects, not interactions with the
-loss: $\mathrm{model}_{\mathrm{mlp}}=+0.060$ ($[0.056,\,0.065]$) and
-$\mathrm{model}_{\mathrm{transformer}}=-0.019$ ($[-0.025,\,-0.013]$) say that the
+loss: $\mathrm{model}_{\mathrm{mlp}}=+0.060$ ($[0.0525,\,0.0692]$) and
+$\mathrm{model}_{\mathrm{transformer}}=-0.019$ ($[-0.0309,\,-0.0086]$) say that the
 MLP has the highest \emph{baseline} accuracy and the Transformer the lowest, not
 that architecture moderates the loss benefit. The genuine moderation evidence is
 the stratified per-model deltas of Section~\nameref{sec:res-loss} (Transformer
 $+0.101$ vs.\ MLP $+0.0027$), which the additive LMM cannot establish. Second,
-the \texttt{scheme} factor is fully confounded with dataset source: in these data
-$\mathrm{scheme}=\text{predefined}$ comprises exactly the ten EasyGeSe species and
-$\mathrm{scheme}=\text{random}$ comprises exactly SoyNAM (four traits) plus the
-CIMMYT wheat panel. The coefficient $\mathrm{scheme}_{\mathrm{random}}=+0.072$
-($[-0.151,\,0.296]$) is therefore a main-effect contrast between two dataset
-groups, not a contrast between structured and random splitting, and it carries no
-loss$\times$scheme interaction; the leave-family-out and cross-environment
-contrasts are not levels of this factor and live entirely in the separate splits
-experiment (Section~\nameref{sec:res-splits}). The NDCG@$10$ model tells the same
+split scheme is fully confounded with dataset source: in these data a
+``predefined'' scheme would comprise exactly the ten EasyGeSe species and a
+``random'' scheme exactly SoyNAM (four traits) plus the CIMMYT wheat panel. Any
+such scheme term would therefore be a main-effect contrast between two dataset
+groups, not a contrast between structured and random splitting, and we accordingly
+omit a scheme term from the model; the leave-family-out and cross-environment
+contrasts are not levels of any such factor and live entirely in the separate
+splits experiment (Section~\nameref{sec:res-splits}). The NDCG@$10$ model tells the same
 story with smaller coefficients (Pearson $+0.0161$, $t=6.09$; hybrid $+0.0173$,
 $t=6.52$; CCC $+0.0173$, $t=6.51$; all CIs excluding zero; MLP $+0.024$,
 Transformer $-0.010$). By
@@ -251,7 +250,7 @@ NDCG@$10$) that survives correction for pseudoreplication; it does not by itself
 improve calibrated phenotypic error (that is the job of affine calibration or the
 CCC loss); and the size of the benefit is governed far more by the architecture
 than by which correlation loss is chosen. The mixed model cannot speak to
-robustness across split types --- its \texttt{scheme} term contrasts dataset
-groups, not splitting strategies --- so the question of whether the benefit
-persists under family- and environment-structured splits is answered (tentatively,
-on thin data) by the splits experiment, not here.
+robustness across split types --- split scheme is confounded with dataset source,
+so we omit a scheme term --- so the question of whether the benefit persists under
+family- and environment-structured splits is answered (tentatively, on thin data)
+by the splits experiment, not here.

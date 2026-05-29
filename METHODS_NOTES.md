@@ -17,7 +17,7 @@ Reproducible: fixed seeds, fixed CV folds, public data, pinned env.
 - **Proposition 3**: batch-averaged Pearson ≠ global Pearson (Exp E, empirical).
 
 ## Datasets (all public, reproducible)
-- **EasyGeSe** (Quesada-Traver 2025, Zenodo 15348871): 10 species — barley, bean, lentil, maize,
+- **EasyGeSe** (Quesada-Traver 2025, Zenodo DOI 10.5281/zenodo.15348871): 10 species — barley, bean, lentil, maize,
   oyster, pig, pine, rice, soybean, wheatG — 93 trait columns total, 0/1/2 genotypes, **predefined
   5-fold × 5-repeat CV partitions** (we use 2 repeats = 10 folds per trait).
 - **CIMMYT wheat** (Crossa 2010, BGLR): 599 lines, 1279 DArT (0/1), grain yield in 4 environments
@@ -60,7 +60,7 @@ the neutral MSE objective, then frozen and reused across all losses (keeps "only
 
 ## Statistics
 Δ(loss) = metric(loss) − metric(MSE) per cell; bootstrap BCa CIs; paired Wilcoxon; Holm + BH-FDR;
-mean method ranks; confirmatory LMM (lme4): `metric ~ loss + model + scheme + (1|dataset) +
+mean method ranks; confirmatory LMM (lme4): `metric ~ loss + model + (1|dataset) +
 (1|dataset:trait)`, MSE as reference level.
 
 ## Experiments
