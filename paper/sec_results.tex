@@ -1,0 +1,350 @@
+\section{Results}\label{sec:results}
+
+\subsection{Numerical validation of the equivalences}\label{sec:res-numerical}
+We first confirm that the identities of Section~\ref{sec:theory} hold not only
+symbolically but to floating-point precision (Figure~\ref{fig:geometry}). Across
+80 randomly generated cases, the implemented Pearson loss, the closed form $1-r$,
+and $\tfrac12\mathrm{MSE}(z_y,z_{\hat y})$ agree to a maximum absolute difference
+of $5.0\times10^{-8}$ (mean $7.4\times10^{-9}$), i.e.\ at the level expected from
+single-precision float tolerance (Proposition~\ref{prop:1}). On real GBLUP
+predictions for the lentil days-to-flowering trait ($r=0.868$), the identity is
+exact (absolute difference $0.0$). The optimal affine recalibration of
+Proposition~\ref{prop:2} attains the predicted residual $\sigma_y^2(1-r^2)$ to a
+maximum absolute difference of $1.2\times10^{-15}$ over 200 cases (mean
+$1.8\times10^{-16}$), i.e.\ float64 machine precision. Finally, both the Pearson
+and the concordance-correlation losses pass \texttt{torch.autograd.gradcheck},
+and the negative-correlation loss $-r$ shares its gradient with $1-r$ exactly
+(maximum gradient difference $0.0$), confirming that the two are the same
+objective. The identity is elementary; what these checks establish is that it
+yields a usable, numerically stable training target.
+
+\subsection{Same architecture, different loss}\label{sec:res-loss}
+Holding the architecture, splits and tuned hyper-parameters fixed so that only
+the loss changes, every correlation-based loss improves predictive ability over
+MSE on average (Figure~\ref{fig:loss}). Pooling all $n=251$ (loss, model,
+dataset) cells, the affine-calibrated Pearson loss raises the Pearson correlation
+by $\Delta r = +0.038$ (BCa 95\% CI $[0.028,\,0.050]$; Holm-corrected paired
+Wilcoxon $p=1.2\times10^{-8}$), the hybrid loss by $+0.041$ ($[0.031,\,0.052]$;
+$p_{\mathrm{Holm}}=4.4\times10^{-11}$), and the CCC loss by $+0.044$
+($[0.034,\,0.056]$; $p_{\mathrm{Holm}}=3.7\times10^{-13}$). The Spearman
+correlation moves almost identically ($+0.037$ to $+0.043$), and $R^2$ rises
+modestly ($+0.015$ to $+0.025$, all CIs excluding zero). This pool is, however,
+\emph{architecturally unbalanced}: the CNN and the MLP were each run on all 101
+trait-datasets (12 species), whereas the Transformer --- which carries the
+largest per-model effect (see below) --- was run on only 49 trait-datasets across
+four species (lentil, maize, rice, soybean), giving $101+101+49=251$. The pooled
+$\Delta$ is therefore an unweighted average over cells that differ in
+architecture and dataset coverage and is best read alongside the model-stratified
+estimates that follow.
+
+These pooled averages conceal a strong dependence on architecture, which is the
+central qualifier of our loss result. The gain is concentrated in the
+harder-to-train networks: for the Transformer, the Pearson loss improves $r$ by
+$+0.101$ ($[0.071,\,0.131]$; $p_{\mathrm{Holm}}=5.6\times10^{-9}$) and the CNN by
+$+0.044$ ($[0.026,\,0.066]$; $p_{\mathrm{Holm}}=0.018$), whereas for the MLP the
+effect is negligible and not robust ($+0.0027$, $[-0.0004,\,0.0055]$;
+$p_{\mathrm{Holm}}=0.046$). The same pattern holds for the hybrid and CCC losses,
+whose MLP $\Delta r$ are $+0.0044$ and $+0.0004$ respectively, the latter not
+significant ($p_{\mathrm{Holm}}=0.17$). The Transformer estimate is the largest
+but rests on the narrowest, non-random dataset base, so the cross-architecture
+ordering (Transformer $>$ CNN $>$ MLP) should be read as a comparison on
+different dataset bases rather than on a common one. In other words, when an
+architecture already optimizes well under MSE (the MLP, which was tuned with an
+MSE objective), aligning the loss with the evaluation metric buys little; the
+benefit appears precisely where MSE optimization is fragile.
+
+Crucially, this correlation gain does not transfer to the scale of the phenotype.
+After affine calibration the Pearson loss leaves pooled RMSE essentially unchanged
+($\Delta\mathrm{RMSE}=-0.010$, BCa CI $[-0.055,\,+0.079]$). The paired-Wilcoxon
+test is nominally significant ($p_{\mathrm{Holm}}=0.0049$) only because it is
+sign-based: most cells move very slightly in the negative direction once
+calibration removes the scale error, but the magnitude is negligible and the BCa
+interval crosses zero, so we do not interpret this as an RMSE improvement. The
+hybrid loss, which retains an explicit MSE term, likewise does \emph{not} reliably
+improve calibrated RMSE ($\Delta\mathrm{RMSE}=+0.006$, $[-0.041,\,+0.097]$; the
+point estimate is positive, i.e.\ marginally worse, and the sign-based
+$p_{\mathrm{Holm}}=1.5\times10^{-4}$ again disagrees with the magnitude-based
+interval). Only the CCC loss, which penalizes scale and offset jointly, lowers
+RMSE materially and reliably in the pool ($-0.057$, $[-0.133,\,-0.027]$, CI
+excluding zero), and within the CNN ($-0.038$, $[-0.070,\,-0.003]$) and
+Transformer ($-0.129$, $[-0.219,\,-0.074]$). The verdict for this section is
+therefore deliberately mixed: correlation-consistent losses reliably improve
+correlation, most for weaker-optimizing architectures, but only the CCC loss
+improves phenotypic-scale error.
+
+\subsection{Calibration effects}\label{sec:res-calibration}
+Applying the post-hoc maps of Proposition~\ref{prop:2} to the Pearson-trained
+networks behaves as the theory predicts in the mean (Figure~\ref{fig:calibration}).
+The mean Pearson correlation is essentially unchanged before and after affine
+calibration ($0.531$ raw vs.\ $0.533$ affine), and the monotone isotonic map
+leaves it close as well ($0.516$). The mean-level invariance is what
+Proposition~\ref{prop:2} guarantees only when the fitted slope $a^\star>0$; since
+$a^\star=\mathrm{cov}(y,p)/\mathrm{var}(p)$ is estimated on validation
+predictions, a fold whose validation covariance is negative yields a
+\emph{decreasing} map on the test fold, which reverses the sign of the
+correlation. This is rare but not absent: $90$ of $9{,}943$ fold-level cells
+($0.91\%$) flip the sign of Pearson $r$ between raw and affine predictions, with
+per-fold $|r_{\mathrm{raw}}-r_{\mathrm{affine}}|$ as large as $0.89$ in those
+degenerate folds. The categorical statement that affine calibration preserves
+every correlation therefore holds only when $a^\star>0$ (almost always; fewer than
+$1\%$ of folds flip), and we qualify it accordingly; the mean-level claim
+($0.531\!\to\!0.533$) is unaffected.
+
+What changes systematically is everything related to scale and offset. The mean
+RMSE drops from $8.68$ (raw) to $7.07$ (affine), the calibration slope moves from
+$4.25$ toward $1$ (to $2.27$ on average for the affine map; the isotonic map has
+a mean fitted slope of $0.76$, i.e.\ it is monotone non-decreasing as it must be),
+and the intercept collapses from a wildly miscalibrated $-378.8$ in raw units to
+$0.10$ after affine calibration. The mean bias likewise shrinks from $-0.755$ to
+$+0.044$. These figures aggregate datasets on heterogeneous phenotypic scales, so
+their absolute magnitudes and large standard deviations should be read
+qualitatively; moreover, like all absolute accuracies here they may be mildly and
+symmetrically inflated by the shared HPO step (Section~\ref{sec:discussion}). The
+consistent message is that a two-parameter affine map fitted on validation
+predictions recovers calibrated predictions at essentially no cost to ranking.
+This is the operational resolution of the scale-invariance objection to
+correlation training: train for shape, then calibrate for scale.
+
+\subsection{Selection-oriented performance}\label{sec:res-selection}
+Because breeding decisions are made by ranking and selecting the top candidates,
+we ask whether the correlation gains translate into better selection
+(Figure~\ref{fig:loss}). They do, but again most clearly for the architectures
+that gained predictive ability. Pooling all cells, NDCG@$10$ improves by $+0.016$
+(Pearson loss, $[0.011,\,0.021]$, $p_{\mathrm{Holm}}=2.0\times10^{-7}$) to
+$+0.017$ (hybrid and CCC); the top-$10\%$ overlap with the true best genotypes
+rises by $+0.014$ to $+0.018$; and the relative efficiency at $10\%$ (achieved
+over oracle selection gain) increases by $\approx\!+0.038$ to $+0.040$ across all
+three losses. Selection differential at $10\%$ also improves (Pearson $+0.25$ in
+trait units, $[0.019,\,0.612]$, $p_{\mathrm{Holm}}=2.4\times10^{-6}$). As with
+predictive ability, these pooled means mix the unbalanced architecture coverage
+($101/101/49$ for CNN/MLP/Transformer). The per-architecture decomposition
+mirrors Section~\ref{sec:res-loss}: the Transformer and CNN gain substantially on
+every selection metric (e.g.\ NDCG@$10$ $+0.029$ and $+0.023$ for the Pearson
+loss), while the MLP gains are small and not robust after Holm correction
+(NDCG@$10$ $+0.0026$, $p_{\mathrm{Holm}}=0.28$; overlap@$10$ $+0.0015$,
+$p_{\mathrm{Holm}}=1.0$). Thus, for the networks where it helps at all, a better
+global correlation does carry through to better top-$k$ selection here; but the
+effect is neither automatic nor uniform, supporting our argument that
+selection-aware metrics must be reported alongside $r$ rather than inferred from
+it.
+
+A second, sobering observation comes from the mean method ranks (Table from
+\texttt{ranks.csv}). Aggregated over all datasets, the simple linear baselines
+win: ridge regression has the best mean rank for both Pearson ($2.85$) and
+NDCG@$10$ ($4.01$), followed by GBLUP ($3.45$ and $4.32$). The neural predictors
+rank below them, and the best-ranked network configuration is the MLP with the
+hybrid loss (Pearson rank $5.28$, NDCG@$10$ rank $4.80$). Within every neural
+architecture, however, the MSE loss is consistently the worst-ranked variant
+(e.g.\ MLP: hybrid $5.28 <$ Pearson $5.47 <$ CCC $5.62 <$ MSE $6.14$; CNN and
+Transformer show the same ordering, with the MSE Transformer last overall at
+$12.67$). We note that these are \emph{absolute} ranks, so the shared-HPO
+optimism that may mildly inflate absolute neural accuracies works in favor of the
+neural nets here; the linear-baselines-win conclusion is therefore conservative,
+since the bias runs against it. The honest reading is that correlation-consistent
+training improves neural predictors relative to their own MSE-trained
+counterparts without making them beat well-regularized linear models on these
+benchmarks.
+
+\subsection{Robustness under difficult splits}\label{sec:res-splits}
+The advantage of correlation training is contingent on the generalization regime
+(\texttt{splits\_summary.csv}), but the evidence here is markedly thinner than in
+the main grid: the leave-family-out (SoyNAM) and random contrasts each rest on
+only $n=4$ datasets with no $p$-values reported, and the cross-environment
+contrast rests on $n=12$ paired comparisons that are themselves non-independent
+($4$ wheat environments yield $12$ ordered transfer pairs on the same $599$
+lines). These results should therefore be read as suggestive and underpowered
+rather than confirmatory. Under random $K$-fold CV the Pearson loss gives a small
+gain in predictive ability ($\Delta r=+0.0041$, BCa CI $[0.0004,\,0.0080]$),
+matched by the hybrid loss ($+0.0040$, $[0.0009,\,0.0072]$). Under the harder,
+breeding-relevant schemes the gain shrinks or reverses. For SoyNAM
+leave-family-out prediction the Pearson loss \emph{lowers} predictive ability
+($\Delta r=-0.0030$, $[-0.0106,\,0.0010]$) and the family NDCG@$10$ contrast is
+negative with a BCa interval that excludes zero ($-0.0042$, $[-0.0089,\,-0.0005]$);
+we describe this as a suggestive degradation rather than a significant one, since
+it is a single bootstrap interval over $4$ paired observations with no $p$-value
+and no correction across the roughly twenty split contrasts examined. The hybrid
+loss behaves similarly on family overlap@$10$ ($-0.019$, $[-0.037,\,-0.0004]$).
+For CIMMYT wheat cross-environment transfer the picture is genuinely ambiguous:
+the Pearson-loss $\Delta r=+0.0098$ has a BCa interval that just excludes zero
+($[0.0001,\,0.0204]$), yet the discrete paired Wilcoxon test on the same $12$
+non-independent pairs returns $p=0.151$. At this $n$ the interval and the rank
+test disagree, and we report both rather than asserting one verdict; there is no
+accompanying NDCG@$10$ benefit ($-0.0012$, $p=0.97$), and the within-environment
+contrast is slightly negative ($\Delta r=-0.0069$). The practical implication is
+that the case for a correlation-consistent loss is clearest under random CV and
+weakest exactly where breeders most need generalization, across families and
+environments; but with this few independent hard splits the directional reads are
+tentative, and the loss should be validated per program rather than assumed to
+transfer.
+
+\subsection{Batch size and optimization stability}\label{sec:res-batch}
+Proposition~\ref{prop:3} predicts that the mini-batch Pearson loss is a biased
+surrogate for the global objective, with the discrepancy growing as the batch
+shrinks. Empirically (\texttt{batch\_summary.csv}) the effect is real but small at
+the scales tested. For the Pearson loss, full-batch training ($-1$) and large
+batches give the best validation correlation ($r=0.5782$ at full-batch, $0.5790$
+at batch $512$) and the lowest RMSE ($7.56$ and $7.55$), while small batches are
+slightly worse ($r=0.5774$ at batch $32$, $0.5777$ at batch $128$, with RMSE
+$\approx\!7.61$); NDCG@$10$ follows the same ordering ($0.782$ at full/large
+batch vs.\ $0.775$ at small batch). As expected for an objective that is already a
+sum of squared errors, MSE training is essentially flat across batch sizes
+($r\approx0.568$ at $32$, $128$, $512$ and full-batch). These are absolute
+validation correlations and, like the calibration table, may be mildly and
+symmetrically inflated by the shared HPO step; the batch-size \emph{comparison} is
+within the Pearson loss and is unaffected. The recommendation that follows is
+conservative and cheap: evaluate the Pearson loss on as large a batch as memory
+allows (full-batch is feasible for the panel sizes here), which optimizes the
+intended global objective and removes a source of avoidable mini-batch noise
+without materially increasing cost.
+
+\subsection{When does correlation-consistent training help?}\label{sec:res-meta}
+A confirmatory linear mixed model, fitted on the affine-calibrated predictions
+with MSE as the reference level and random intercepts for dataset and
+dataset:trait, summarizes the average effect of each loss
+(Figure~\ref{fig:meta}). For predictive ability, every correlation loss has a
+positive, CI-excluding-zero fixed effect: $+0.0389$ for the Pearson loss
+($[0.033,\,0.045]$, $t=12.7$), $+0.0412$ for the hybrid ($t=13.5$), and $+0.0448$
+for the CCC loss ($t=14.7$). These $t$-statistics should not be read as the model
+treating $10{,}040$ independent observations: the LMM is fitted on $1{,}004$
+(dataset, trait, model, loss) cells, each contributing $10$ fold-level rows ($5$
+folds $\times$ $2$ repeats) that reuse the same tuned architecture and overlapping
+training data and are therefore not independent. As a sensitivity check we refit
+with an additional per-cell random intercept; this inflates the standard error of
+the Pearson-loss coefficient by about $1.75\times$ ($0.0031\to0.0054$) and reduces
+$t$ from $12.7$ to $7.2$, but the coefficient ($+0.0387$) and its $95\%$ CI
+($[0.028,\,0.049]$) still exclude zero. Aggregating instead to a single value per
+cell before fitting gives the same conclusion (Pearson $+0.038$,
+$[0.028,\,0.049]$; NDCG@$10$ $+0.016$, $[0.011,\,0.021]$). The loss CIs for
+correlation and ranking thus survive correction for pseudoreplication, but the
+nominal precision of the uncorrected model is overstated and should be read with
+this caution; the model also reports no denominator-$df$-based $p$-values, so we
+rely on the CIs.
+
+Two structural caveats bound the model's interpretation. First, the
+\texttt{model} terms are additive \emph{main} effects, not interactions with the
+loss: $\mathrm{model}_{\mathrm{mlp}}=+0.060$ ($[0.056,\,0.065]$) and
+$\mathrm{model}_{\mathrm{transformer}}=-0.019$ ($[-0.025,\,-0.013]$) say that the
+MLP has the highest \emph{baseline} accuracy and the Transformer the lowest, not
+that architecture moderates the loss benefit. The genuine moderation evidence is
+the stratified per-model deltas of Section~\ref{sec:res-loss} (Transformer
+$+0.101$ vs.\ MLP $+0.0027$), which the additive LMM cannot establish. Second,
+the \texttt{scheme} factor is fully confounded with dataset source: in these data
+$\mathrm{scheme}=\text{predefined}$ comprises exactly the ten EasyGeSe species and
+$\mathrm{scheme}=\text{random}$ comprises exactly SoyNAM (four traits) plus the
+CIMMYT wheat panel. The coefficient $\mathrm{scheme}_{\mathrm{random}}=+0.072$
+($[-0.151,\,0.296]$) is therefore a main-effect contrast between two dataset
+groups, not a contrast between structured and random splitting, and it carries no
+loss$\times$scheme interaction; the leave-family-out and cross-environment
+contrasts are not levels of this factor and live entirely in the separate splits
+experiment (Section~\ref{sec:res-splits}). The NDCG@$10$ model tells the same
+story with smaller coefficients (Pearson $+0.0164$, hybrid $+0.0174$, CCC
+$+0.0174$, all CIs excluding zero; MLP $+0.024$, Transformer $-0.010$). By
+contrast, the RMSE mixed model finds \emph{no} reliable loss effect after affine
+calibration: the Pearson ($-0.010$), hybrid ($+0.006$) and CCC ($-0.057$)
+coefficients all have intervals spanning zero, whereas the architecture effects
+are large (MLP $-0.435$, Transformer $-0.126$).
+
+Taken together, the meta-analysis supports a precise and qualified conclusion.
+Correlation-consistent training delivers a small, model-averaged improvement in
+correlation- and ranking-based accuracy ($\approx\!+0.04$ in $r$ and $+0.017$ in
+NDCG@$10$) that survives correction for pseudoreplication; it does not by itself
+improve calibrated phenotypic error (that is the job of affine calibration or the
+CCC loss); and the size of the benefit is governed far more by the architecture
+than by which correlation loss is chosen. The mixed model cannot speak to
+robustness across split types --- its \texttt{scheme} term contrasts dataset
+groups, not splitting strategies --- so the question of whether the benefit
+persists under family- and environment-structured splits is answered (tentatively,
+on thin data) by the splits experiment, not here.
+
+\section{Discussion}\label{sec:discussion}
+
+\paragraph{The loss is not a magic bullet.}
+Correlation-consistent training reliably improves the very metric genomic
+prediction reports --- the Pearson correlation --- and the rank-based selection
+metrics that breeders act on, but the model-averaged effect is modest
+($\approx\!+0.04$ in $r$) and is dominated by architecture rather than by the
+choice among Pearson, hybrid and CCC losses. It helps most for the
+harder-to-optimize networks (the Transformer, and to a lesser extent the CNN) and
+essentially not at all for the MLP, which is intrinsically the strongest neural
+architecture here and was tuned under an MSE objective. The headline Transformer
+gain ($+0.10$ in $r$) is also computed on a smaller, non-random subset (49 of the
+101 trait-datasets, four species), so it is not on a common dataset base with the
+CNN and MLP estimates and should be read as architecture-specific rather than as
+a transferable effect size.
+
+\paragraph{Calibration is mandatory for phenotypic scale.}
+Because a correlation loss is scale- and offset-free, calibrated phenotypic values
+require an explicit calibration step. The closed-form affine map recovers RMSE
+($8.68\to7.07$), slope ($4.25\to2.27$) and intercept ($-378.8\to0.10$) at no cost
+to mean ranking, which resolves the standard objection to correlation training. We
+emphasize one qualification: the invariance is exact only when the fitted slope is
+positive, which holds in more than $99\%$ of folds but fails in a small minority
+where the validation covariance is negative and the map becomes decreasing on the
+test fold. The marginally lower Pearson of the isotonic map ($0.516$ vs.\ $0.533$
+affine) is \emph{not} due to non-monotonicity --- isotonic regression is monotone
+non-decreasing by construction, with a positive mean fitted slope of $0.76$ here.
+It arises because isotonic regression maps distinct inputs to identical fitted
+values on its piecewise-constant plateaus, creating ties that can slightly perturb
+a tie-sensitive correlation; the rank order, and hence Spearman, is preserved.
+
+\paragraph{Selection requires top-$k$ and ranking metrics.}
+A better global $r$ did carry through to better top-$k$ selection for the networks
+that gained predictive ability, but not automatically or uniformly --- the MLP's
+selection gains were small and did not survive Holm correction (NDCG@$10$
+$p_{\mathrm{Holm}}=0.28$; overlap@$10$ $p_{\mathrm{Holm}}=1.0$). Because selection
+operates in the tail of the distribution, NDCG@$k$, top-$k$ overlap and selection
+differential should be reported alongside $r$ rather than inferred from it.
+
+\paragraph{Recommendations.}
+(1)~When the objective is correlation or ranking and the architecture is one that
+optimizes poorly under MSE, a correlation-consistent loss is worth trying; for a
+well-tuned MLP the expected benefit is negligible. (2)~Always apply the
+closed-form affine calibration when calibrated phenotypic values are needed; it is
+free and lossless for ranking whenever its slope is positive. (3)~Evaluate the
+Pearson loss on as large a batch as memory permits, to optimize the global rather
+than a batch-averaged objective. (4)~Among the losses studied, only the CCC loss
+reliably improved \emph{calibrated} RMSE in the pool ($-0.057$, CI excluding
+zero); we therefore credit CCC alone for pooled calibrated-RMSE improvement. The
+hybrid loss did not (pooled $+0.006$, CI $[-0.041,\,+0.097]$, point estimate
+worse), lowering RMSE only for the Transformer ($-0.119$) while raising it for the
+CNN ($+0.080$); if RMSE is the target, prefer CCC, or scope the hybrid loss to the
+Transformer.
+
+\paragraph{Limitations.}
+Three limitations bound the strength of our claims. First, hyper-parameters were
+selected on full-data validation splits under a neutral MSE objective, so test-fold
+phenotypes can inform architecture choice. Because the chosen architecture is
+frozen and shared identically across losses, this cannot bias our
+within-architecture $\Delta$-vs-MSE comparisons --- the inferential target --- but
+it may mildly and symmetrically inflate the \emph{absolute} numbers we report
+(raw $r$ values, the batch-size correlations, the calibration RMSE table, and the
+absolute method ranks). None of these absolute values should be read as unbiased
+estimates of attainable accuracy; the linear-baselines-win ranking is conservative
+under this bias, since the optimism favors the neural nets. Second, the confirmatory
+mixed model is fitted on fold-level rows that are pseudoreplicated within cell; our
+sensitivity refits (per-cell random intercept; cell-level aggregation) leave the
+correlation and NDCG loss CIs excluding zero but roughly halve the nominal $t$,
+and the uncorrected intervals should be read with that caution. Third --- and most
+important for breeding relevance --- the number of genuinely independent hard
+splits is small ($n=4$ datasets for leave-family-out and random, $12$
+non-independent pairs for cross-environment), so the directional finding that the
+benefit weakens or reverses under family- and environment-structured splits is
+suggestive rather than established. We explicitly do \emph{not} read the null
+\texttt{scheme} main effect in the mixed model as evidence that the loss benefit
+``persists'' under hard splits: that coefficient contrasts two dataset groups, not
+two splitting strategies, and it is not a loss$\times$scheme interaction. The
+relevant evidence is the splits experiment, where the gain in fact shrinks or
+reverses; reconciling the two, our honest reading is that the benefit is clearest
+under random CV and uncertain under the harder regimes, and should be validated per
+program.
+
+\section{Conclusion}
+A standardized-MSE Pearson loss aligns neural-network training with the
+predictive-ability metric used throughout genomic prediction; because correlation
+is scale-free, affine calibration or the CCC loss is required when calibrated
+phenotypic values matter; and for breeding decisions, global correlation should be
+complemented by top-$k$ and ranking-aware metrics. Empirically, the benefit of
+correlation-consistent training is real but modest, is governed chiefly by
+architecture, and is weakest under the family- and environment-structured splits
+that breeding programs most rely on --- so it is a useful, well-characterized tool
+to be applied judiciously, not a uniform replacement for MSE.

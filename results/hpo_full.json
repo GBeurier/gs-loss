@@ -1,0 +1,659 @@
+{
+ "easygese:barley": {
+  "trait": "BaMMV",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 1000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      256,
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 16,
+     "fc_dim": 64,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 128
+   }
+  }
+ },
+ "easygese:bean": {
+  "trait": "DF",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      512,
+      128
+     ],
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      32,
+      64
+     ],
+     "kernel_size": 11,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   }
+  }
+ },
+ "easygese:lentil": {
+  "trait": "DTF",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      512,
+      128
+     ],
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 1e-05,
+    "batch_size": 64
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      32,
+      64
+     ],
+     "kernel_size": 11,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   },
+   "transformer": {
+    "arch_kwargs": {
+     "n_tokens": 64,
+     "d_model": 64,
+     "n_heads": 4,
+     "n_layers": 2,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 64
+   }
+  }
+ },
+ "easygese:maize": {
+  "trait": "Yield_Mg_ha",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      256,
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 64
+   },
+   "transformer": {
+    "arch_kwargs": {
+     "n_tokens": 32,
+     "d_model": 64,
+     "n_heads": 4,
+     "n_layers": 1,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 256
+   }
+  }
+ },
+ "easygese:oyster": {
+  "trait": "mm",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      256,
+      128,
+      32
+     ],
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      8,
+      16
+     ],
+     "kernel_size": 21,
+     "first_stride": 4,
+     "fc_dim": 64,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.0001,
+    "batch_size": 128
+   }
+  }
+ },
+ "easygese:pig": {
+  "trait": "PFAI",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      64
+     ],
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 256
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      8,
+      16
+     ],
+     "kernel_size": 21,
+     "first_stride": 8,
+     "fc_dim": 128,
+     "dropout": 0.2
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 1e-05,
+    "batch_size": 256
+   }
+  }
+ },
+ "easygese:pine": {
+  "trait": "rootnum",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 0.001,
+    "batch_size": 128
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 64
+   }
+  }
+ },
+ "easygese:rice": {
+  "trait": "Plant_height",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      512,
+      128
+     ],
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      32,
+      64
+     ],
+     "kernel_size": 11,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   },
+   "transformer": {
+    "arch_kwargs": {
+     "n_tokens": 32,
+     "d_model": 64,
+     "n_heads": 4,
+     "n_layers": 2,
+     "dropout": 0.2
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 1e-05,
+    "batch_size": 256
+   }
+  }
+ },
+ "easygese:soybean": {
+  "trait": "C13",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      64
+     ],
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 256
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 16,
+     "fc_dim": 64,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 128
+   },
+   "transformer": {
+    "arch_kwargs": {
+     "n_tokens": 128,
+     "d_model": 64,
+     "n_heads": 4,
+     "n_layers": 1,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   }
+  }
+ },
+ "easygese:wheatG": {
+  "trait": "EW",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      256,
+      64
+     ],
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.0001,
+    "batch_size": 128
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 16,
+     "fc_dim": 64,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 128
+   }
+  }
+ },
+ "wheat:_": {
+  "trait": "env1",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 1000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      512,
+      128
+     ],
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 1e-05,
+    "batch_size": 64
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 16,
+     "fc_dim": 64,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 128
+   }
+  }
+ },
+ "soynam:yield": {
+  "trait": "yield",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 0.001,
+    "batch_size": 128
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 7,
+     "first_stride": 4,
+     "fc_dim": 32,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 0.0001,
+    "batch_size": 128
+   }
+  }
+ },
+ "soynam:height": {
+  "trait": "height",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 1000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 0.001,
+    "batch_size": 128
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      32,
+      64
+     ],
+     "kernel_size": 11,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   }
+  }
+ },
+ "soynam:protein": {
+  "trait": "protein",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 1000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 0.001,
+    "batch_size": 128
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      16,
+      32
+     ],
+     "kernel_size": 21,
+     "first_stride": 16,
+     "fc_dim": 64,
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 1e-05,
+    "batch_size": 128
+   }
+  }
+ },
+ "soynam:oil": {
+  "trait": "oil",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 1000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.0003,
+    "weight_decay": 0.001,
+    "batch_size": 128
+   },
+   "cnn": {
+    "arch_kwargs": {
+     "channels": [
+      32,
+      64
+     ],
+     "kernel_size": 11,
+     "first_stride": 8,
+     "fc_dim": 32,
+     "dropout": 0.1
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.003,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   }
+  }
+ }
+}

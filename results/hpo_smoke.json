@@ -1,0 +1,96 @@
+{
+ "easygese:lentil": {
+  "trait": "DTF",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      512,
+      128
+     ],
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   }
+  }
+ },
+ "easygese:bean": {
+  "trait": "DF",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      512,
+      128
+     ],
+     "dropout": 0.3
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.001,
+    "batch_size": 64
+   }
+  }
+ },
+ "wheat:_": {
+  "trait": "env1",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 1000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      256,
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256
+   }
+  }
+ },
+ "soynam:yield": {
+  "trait": "yield",
+  "params": {
+   "gblup": {},
+   "ridge": {
+    "alpha": 10000.0
+   },
+   "mlp": {
+    "arch_kwargs": {
+     "hidden_dims": [
+      256,
+      128,
+      32
+     ],
+     "dropout": 0.5
+    },
+    "max_epochs": 150,
+    "patience": 15,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 256
+   }
+  }
+ }
+}

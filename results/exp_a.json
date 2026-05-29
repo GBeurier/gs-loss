@@ -1,0 +1,25 @@
+{
+  "proposition1": {
+    "max_abs_diff": 5.017761128822684e-08,
+    "mean_abs_diff": 7.375345690565586e-09,
+    "n_cases": 80
+  },
+  "proposition2": {
+    "max_abs_diff": 1.1934897514720433e-15,
+    "mean_abs_diff": 1.7975421498506173e-16,
+    "n_cases": 200
+  },
+  "gradient": {
+    "pearson_gradcheck": true,
+    "ccc_gradcheck": true
+  },
+  "neg_pearson_gradient": {
+    "max_grad_diff": 0.0
+  },
+  "real_predictions": {
+    "dataset": "lentil",
+    "trait": "DTF",
+    "r": 0.8678151912591033,
+    "abs_diff_identity": 0.0
+  }
+}

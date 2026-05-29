@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Large, regenerable, or third-party data (rebuilt by reproduce.sh)
+data_cache/
+EasyGeSe/
+scratch/
+
+# Raw result arrays and big tables are regenerable; we keep the small analysis
+# summaries (results/analysis/*.csv), figures, exp_a.json and tuned HPO configs.
+results/*.parquet
+results/analysis/lmm_long.csv
+*.log
+_*.log
+
+# LaTeX build artifacts (the compiled paper/main.pdf is kept)
+paper/*.aux
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz
+paper/*.fls
+paper/*.fdb_latexmk
+paper/_wf_*.tex
+
+# OS
+.DS_Store
+
+# internal planning / AI task prompt (not part of the deliverable)
+Instructions.txt
+Overview.md

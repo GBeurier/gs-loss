@@ -1,0 +1,18 @@
+\subsection{Real breeding case study: sorghum crop-model parameters}\label{sec:res-sorghum}
+As an external check on private data of a different nature, we applied the
+identical protocol to a sorghum panel of $136$ genotypes ($\sim$31{,}700 SNPs,
+capped to $20{,}000$ by variance) in which the prediction targets are eight
+parameters of an ecophysiological crop-growth model (e.g.\ radiation-use
+efficiency and leaf-appearance rates) rather than measured phenotypes. Averaged
+over the eight parameters under $5$-fold $\times\,3$-repeat cross-validation, the
+affine-calibrated MLP trained with the Pearson loss raised predictive ability over
+its MSE baseline by $\Delta r=+0.041$ (BCa CI $[0.004,\,0.076]$), with the hybrid
+($+0.033$) and CCC ($+0.029$) losses close behind, and NDCG@$10$ improved by
+$+0.018$ to $+0.021$. The effect size matches the public benchmark almost exactly,
+although with only eight targets it is not individually significant (Holm
+$p=0.33$). That an independent, proprietary dataset --- a different species, a
+different target type, and a different research group --- reproduces the same
+qualitative pattern is reassuring: aligning the neural training objective with the
+correlation metric improves that metric, and affine calibration restores the
+parameter scale. We report this as illustrative external evidence, not as an
+additional powered test.
