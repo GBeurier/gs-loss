@@ -1,0 +1,394 @@
+\documentclass[9pt,twocolumn,twoside,lineno]{gsag3jnl}
+
+\articletype{gs} % Genomic Selection
+
+% Theorem-like environments for the propositions and their proofs.
+\usepackage{amsthm}
+\theoremstyle{plain}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+% Numeric placeholder macro carried over from the single-column source.
+\newcommand{\NUM}[1]{#1}
+
+\title{Metric-consistent neural networks for genomic prediction and selection: a standardized-MSE Pearson loss, affine calibration, and selection-aware evaluation}
+
+\author[$\ast$,$\dagger$,1]{Gr\'egory Beurier}
+\author[$\ast$,$\dagger$]{Denis Cornet}
+\author[$\ast$,$\dagger$]{Lauriane Rouan}
+\author[$\ast$,$\dagger$]{David Cros}
+
+\affil[$\ast$]{CIRAD, UMR AGAP Institut, Montpellier, France}
+\affil[$\dagger$]{UMR AGAP Institut, Univ Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France}
+
+\keywords{genomic prediction \\ genomic selection \\ deep learning \\ loss functions \\ calibration}
+
+\runningtitle{Metric-consistent neural networks for genomic prediction}
+
+\runningauthor{Beurier \textit{et al.}}
+
+\begin{abstract}
+Genomic prediction models for plant and animal breeding are trained almost universally to minimize the mean squared error, yet they are evaluated, and used to select candidate genotypes, by the Pearson correlation between predicted and observed phenotypes and by candidate ranking. We characterize correlation-consistent training objectives for neural genomic prediction, using the elementary identity that maximizing the correlation is equivalent to minimizing the mean squared error of standardized variables as a numerically stable training target, and we frame a closed-form post-hoc affine recalibration that restores predictive scale and offset while leaving the correlation and all rankings unchanged whenever its fitted slope is positive. Holding architecture, data splits and tuning fixed so that only the loss differs, across 101 trait-datasets from 12 species we find that correlation and concordance losses raise predictive ability over the squared-error baseline by roughly 0.04 in correlation and improve selection-aware metrics. The benefit is strongly architecture-dependent: large for Transformer and convolutional networks, but negligible for a well-tuned multilayer perceptron. Among the losses, only the concordance loss reliably lowers calibrated error; the correlation and hybrid losses leave it statistically unchanged once affine calibration restores scale. The advantage weakens, and on some metrics reverses, under harder leave-family-out and cross-environment splits, although these contrasts are underpowered. No neural loss unseated ridge regression or genomic best linear unbiased prediction on mean rank. Correlation-consistent training is thus a principled, well-characterized refinement to be applied judiciously, not a universal replacement for squared-error training.
+\end{abstract}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{firststyle}
+\logomark
+\articletypemark
+\marginmark
+\firstpagefootnote
+
+\correspondingauthoraffiliation{1}{Corresponding author: CIRAD, UMR AGAP Institut, Montpellier, France. E-mail: gregory.beurier@cirad.fr}
+\vspace{-34pt}% Only used for adjusting extra space in the left column of the first page
+
+\section{Introduction}
+
+Genomic selection \citep{meuwissen2001} predicts the genetic merit of candidate
+individuals from genome-wide markers, and has become central to modern plant and
+animal breeding \citep{heffner2009,jannink2010,desta2014}. The dominant
+parametric baseline, genomic best linear unbiased prediction
+(GBLUP)/ridge-regression BLUP \citep{vanraden2008,endelman2011}, is increasingly
+complemented by machine-learning and deep-learning predictors
+\citep{ma2018deepgs,wang2023dnngp,montesinos2021review,montesinos2021power}.
+Whether deep learning improves on GBLUP remains dataset-dependent: recent
+comparisons find that neither systematically dominates, and that outcomes hinge
+on tuning, architecture and the choice of evaluation metric
+\citep{montesinos2025dlgblup}.
+
+That last point is the subject of this paper. Genomic predictors are trained, by
+near-universal default, to minimize the mean squared error (MSE). But they are
+\emph{assessed} with the Pearson correlation $r$ between predicted and observed
+phenotypes --- the ``predictive ability'' reported in essentially every genomic
+prediction study \citep{crossa2010} --- and they are \emph{used} to rank
+candidates and select the best ones. There is therefore a systematic mismatch
+between the training objective and the objective that actually matters.
+\citet{waldmann2019} showed that selecting a model by $r$ can disagree with
+selecting it by MSE or $R^2$. \citet{ornella2014} argued that $r$ is a poor guide
+to performance in the tails of the distribution, where selection actually
+operates, and evaluated the recovery of the best $\alpha\in\{10,\dots,40\}\%$ of
+individuals. \citet{blondel2015} reframed genomic selection as a ranking problem,
+introduced NDCG from information retrieval as an accuracy measure, and reported
+that $r$ correlates poorly with ranking quality.
+
+If correlation is the target, why not train for it directly? A recent
+convolutional architecture for genomic selection states plainly that ``Pearson
+correlation cannot be set as the loss function'' and substitutes a family of
+$L_p$ losses \citep{pnngs2024}. We show this premise is false. The Pearson
+correlation \emph{is} a loss --- a standardized MSE --- and training with it is
+both well posed and numerically stable. The remaining objection to a correlation
+loss, that it ignores scale and offset, is real but easily and provably remedied
+by an affine recalibration applied after training.
+
+\subsubsection{Contributions:}
+\begin{enumerate}
+\item \textbf{A standardized-MSE Pearson loss (Section~\nameref{sec:prop1}).} We give
+the exact identity $\mathrm{MSE}(z_y,z_{\hat y}) = 2(1-r)$ and use it as a stable,
+differentiable training objective, verified numerically (to single-precision
+tolerance for the loss; to float64 machine precision for the calibration identity).
+\item \textbf{Affine calibration with a closed form
+(Section~\nameref{sec:prop2}).} We prove that the optimal post-hoc affine map yields
+residual error $\sigma_y^2(1-r^2)$ and restores scale and offset while preserving
+$r$ and all rankings --- turning the scale-invariance ``weakness'' of correlation
+into a controlled, two-parameter calibration step.
+\item \textbf{Mini-batch analysis (Section~\nameref{sec:prop3}).} We show the
+mini-batch Pearson loss is a biased surrogate for the global objective and
+quantify the effect of batch size empirically.
+\item \textbf{A reproducible, selection-aware benchmark
+(Sections~\nameref{sec:methods}--\nameref{sec:results}).} Across 101
+trait--datasets from 12 species, with architecture, splits and tuning held
+fixed so that only the loss changes, we report both predictive and
+selection-oriented metrics, a confirmatory mixed-model analysis, and a
+meta-analysis of \emph{when} correlation-consistent training helps. All data are
+public and all code, splits and tuned configurations are released.
+\end{enumerate}
+
+\noindent We do not claim that a Pearson loss is uniformly superior to MSE; that
+would be false. We provide a principled, reproducible framework for training,
+calibrating and evaluating neural genomic predictors when the breeding objective
+is correlation and ranking rather than raw squared error.
+
+\section{Theory}\label{sec:theory}
+Throughout, $y,\hat y\in\mathbb{R}^n$, with sample means $\bar y,\bar{\hat y}$ and
+population variances $\sigma_x^2 = \tfrac1n\sum_i (x_i-\bar x)^2$. The Pearson
+correlation is $r=r(y,\hat y)=\tfrac1n\sum_i z_{y,i} z_{\hat y,i}$ where
+$z_{x,i}=(x_i-\bar x)/\sigma_x$ is the standardized variable.
+
+\subsection{The Pearson loss is a standardized MSE}\label{sec:prop1}
+\begin{proposition}\label{prop:1}
+For non-degenerate $y,\hat y$ (i.e.\ $\sigma_y,\sigma_{\hat y}>0$),
+\[
+\mathrm{MSE}(z_y,z_{\hat y}) \;=\; \tfrac1n\sum_{i=1}^n (z_{y,i}-z_{\hat y,i})^2
+\;=\; 2\,(1-r).
+\]
+Consequently $1-r = \tfrac12\,\mathrm{MSE}(z_y,z_{\hat y})$, and minimizing the
+standardized MSE is exactly maximizing the Pearson correlation.
+\end{proposition}
+\begin{proof}
+Expanding the square,
+$\tfrac1n\sum_i (z_{y,i}-z_{\hat y,i})^2
+= \tfrac1n\sum_i z_{y,i}^2 - 2\tfrac1n\sum_i z_{y,i} z_{\hat y,i}
++ \tfrac1n\sum_i z_{\hat y,i}^2 = 1 - 2r + 1 = 2(1-r)$,
+because $\tfrac1n\sum_i z_{x,i}^2 = 1$ by construction and
+$\tfrac1n\sum_i z_{y,i} z_{\hat y,i}=r$.
+\end{proof}
+This gives the loss $\mathcal{L}_{\mathrm{P}}(\hat y,y) = 1-r(\hat y,y)$,
+implemented as $\tfrac12\,\mathrm{MSE}(z_y,z_{\hat y})$ with a small $\varepsilon$
+guarding the standardization denominators. It is differentiable everywhere
+$\sigma_{\hat y}>0$; we verify the gradient against finite differences and verify
+the identity to single-precision tolerance in Section~\nameref{sec:res-numerical}. The
+negative-correlation loss $-r$ differs from $\mathcal{L}_{\mathrm{P}}$ by a
+constant and has identical gradients.
+
+\subsection{Affine calibration restores scale without changing rank}\label{sec:prop2}
+Correlation is invariant to strictly increasing affine transformations of $\hat
+y$: a model trained on $\mathcal{L}_{\mathrm{P}}$ controls the \emph{shape} of the
+prediction but not its scale or offset. This is corrected exactly and cheaply.
+\begin{proposition}\label{prop:2}
+Let $p\in\mathbb{R}^n$ be raw predictions and $r=r(y,p)$. The affine map
+$\tilde y = a\,p+b$ minimizing $\tfrac1n\sum_i (a p_i + b - y_i)^2$ has
+\[
+a^\star = \frac{\mathrm{cov}(y,p)}{\mathrm{var}(p)},\qquad
+b^\star = \bar y - a^\star\,\bar p,\qquad
+\mathrm{MSE}_{\min} = \sigma_y^2\,(1-r^2).
+\]
+If $a^\star>0$, the map is strictly increasing and hence preserves $r$, the
+Spearman correlation, and every top-$k$/ranking quantity, while setting the
+calibration slope to $1$ and intercept to $0$.
+\end{proposition}
+\begin{proof}
+Ordinary least squares for a single predictor gives $a^\star,b^\star$ as stated;
+the minimized residual variance of simple linear regression is
+$\sigma_y^2(1-r^2)$. A strictly increasing transform preserves the order of $p$
+and leaves correlation-type and rank-based statistics unchanged.
+\end{proof}
+We fit $(a^\star,b^\star)$ on held-out validation predictions (never on the test
+set) and apply them to the test predictions. Isotonic regression provides a
+monotone non-linear alternative when the raw-vs-true relationship is monotone but
+curved. Calibration cannot change $r$ but can dramatically improve RMSE, bias and
+the calibration slope (Figure~\ref{fig:simulation}; Section~\nameref{sec:res-calibration}).
+
+\subsection{Mini-batch versus global Pearson}\label{sec:prop3}
+\begin{proposition}\label{prop:3}
+For a partition of the data into batches $B_1,\dots,B_K$, the batch-averaged loss
+$\tfrac1K\sum_k \bigl(1-r_{B_k}\bigr)$ is not equal to $1-r_{\mathrm{global}}$ in
+general, because $r$ is a non-linear (ratio-of-moments) functional of the data.
+The discrepancy and the variance of the gradient estimate grow as the batch size
+decreases.
+\end{proposition}
+A full-batch (or large-batch) evaluation of $\mathcal{L}_{\mathrm{P}}$ therefore
+optimizes the global objective, whereas small batches optimize a noisier
+surrogate. We quantify the practical consequence for training stability and
+predictive ability in Section~\nameref{sec:res-batch}.
+
+\subsection{Multi-trait and group-aware variants}\label{sec:groupaware}
+The loss extends naturally to $T$ traits, $\mathcal{L}=\tfrac1T\sum_{t=1}^T
+(1-r_t)$ (or a weighted sum $\sum_t w_t(1-r_t)$), and to a group-aware objective
+$\mathcal{L}=\tfrac1G\sum_{g=1}^G (1-r_g)$ where $g$ indexes environments, years,
+families or sites --- aligning training with the within-environment correlation
+that multi-environment breeding programs actually care about. As in
+Proposition~\ref{prop:3}, neither variant equals the pooled global correlation.
+
+\section{Materials and Methods}\label{sec:methods}
+
+\subsection{Datasets}
+We use three public sources, for a total of 101
+trait--dataset combinations across 12 species. (i) \emph{EasyGeSe}
+\citep{quesada2025easygese}: a benchmark of ten species (barley, common bean,
+lentil, maize, eastern oyster, pig, loblolly pine, rice, soybean and wheat)
+providing genotypes, phenotypes and \emph{fixed} cross-validation partitions; the
+maize set is the global genotype-by-environment competition panel
+\citep{washburn2025maize}. (ii) The CIMMYT \emph{wheat} panel
+\citep{crossa2010}: 599 lines, 1{,}279 DArT markers and grain yield in four
+environments, used for cross-environment transfer. (iii) \emph{SoyNAM}
+\citep{xavier2016soynam}: $\sim$5{,}500 recombinant inbred lines in 40 biparental
+families, used for leave-family-out prediction. Genotypes are coded as allele
+dosages; preprocessing (unsupervised, no phenotype) applies a minor-allele
+frequency filter ($\geq 0.01$), mean imputation, and a top-variance cap at
+20{,}000 markers for the two ultra-high-dimensional panels.
+Table~\ref{tab:datasets} and Figure~\ref{fig:datasets} summarize the data.
+
+\subsection{Models}
+The parametric baseline is GBLUP with REML-estimated variance
+components, implemented in the spectral basis of the linear genomic kernel
+$K=XX^\top/p$ and validated against the \texttt{rrBLUP} package
+\citep{endelman2011} to floating-point precision (cross-implementation
+correlation $1.0000$). We also include ridge regression, elastic net, random
+forest and gradient-boosted trees \citep{chen2016xgboost}. The neural predictors
+are a multilayer perceptron (MLP), a one-dimensional convolutional network over
+ordered markers (1D-CNN), and a light Transformer over marker patches. Crucially,
+\emph{the architecture is held fixed across losses}: it is tuned once per
+(dataset, model) with a neutral MSE objective and then frozen, so that the only
+thing that changes in the loss comparison is the loss.
+
+\subsection{Loss functions}
+We compare MSE; the standardized-MSE Pearson loss
+$1-r$ (Proposition~\ref{prop:1}); a hybrid $\,(1-r)+\lambda\,\mathrm{MSE}\,$ with
+$\lambda=0.1$; and a concordance-correlation loss $1-\rho_c$ \citep{lin1989},
+which penalizes correlation, scale and offset jointly. The negative-Pearson and
+explicit standardized-MSE forms are included in the numerical checks.
+
+\subsection{Calibration}
+For every model and loss we report predictions under
+three post-hoc maps: raw (identity), affine (Proposition~\ref{prop:2}) and
+isotonic. Calibrators are fit on validation predictions only.
+
+\subsection{Cross-validation}
+We use the fixed EasyGeSe partitions (5 folds
+$\times$ 3 repeats), repeated $K$-fold for wheat and SoyNAM, leave-family-out for
+SoyNAM, and cross-environment transfer for wheat. Within each training fold an
+inner 80/20 split (group-aware for family CV) provides early-stopping and
+calibration data; markers are standardized with training statistics only;
+targets are standardized with training statistics for the neural networks and
+predictions are returned in the original units. Neural networks early-stop on the
+validation value of the loss being trained. The test fold is never used for
+fitting, early stopping, calibration or hyper-parameter selection.
+
+\subsection{Evaluation metrics}
+Predictive: Pearson $r$, Spearman $\rho$, RMSE,
+MAE, $R^2$, mean bias, and the calibration slope and intercept (ideal $1$ and
+$0$). Selection-aware, at intensities $k\in\{5,10,15,20\}\%$: top-$k$ overlap,
+precision@$k$, recall@$k$, NDCG@$k$ \citep{jarvelin2002ndcg}, selection
+differential, mean phenotype of the selected, and relative efficiency (achieved
+gain divided by the oracle gain).
+
+\subsection{Statistical Analysis}
+For each cell we average over folds and form
+$\Delta m = m_{\mathrm{loss}}-m_{\mathrm{MSE}}$ within the same architecture.
+We report bootstrap (BCa) confidence intervals, paired Wilcoxon tests with
+Holm and Benjamini--Hochberg \citep{benjamini1995} correction, and mean method
+ranks. As a corroborative analysis we fit a linear mixed model
+\citep{bates2015lme4} on cell-level means (one observation per
+dataset$\times$trait$\times$model$\times$loss, which avoids fold-level
+pseudoreplication), $\textit{metric}\sim \textit{loss}+\textit{model}+(1\mid
+\textit{dataset})+(1\mid \textit{dataset:trait})$ with MSE as the reference level.
+The primary inference is the cell-level paired contrast; the mixed model only
+corroborates it. (We do not interpret a split-scheme effect in this model, as
+scheme is confounded with dataset source; difficult-split generalization is
+addressed directly in Section~\nameref{sec:res-splits}.)
+The framework is released as the Python package
+\texttt{ccgp} (PyTorch, scikit-learn, XGBoost), with fixed seeds, the exact CV
+partitions, tuned configurations and a pinned environment. \emph{Limitation:}
+hyper-parameters are tuned on full-data validation splits with a neutral MSE
+objective and frozen across losses; because the architecture is shared
+identically by every loss, this cannot bias the relative (loss/calibration)
+comparisons that constitute our claims, though it may mildly and symmetrically
+inflate absolute accuracies.
+
+\subsection{Data Availability}
+All datasets are public: EasyGeSe (Zenodo record 15348871), the CIMMYT wheat panel
+(\texttt{BGLR} R package) and SoyNAM (\texttt{SoyNAM} R package). Code, fixed
+cross-validation partitions, tuned configurations and a pinned environment are
+released as the \texttt{ccgp} package, with source at
+\url{https://github.com/GBeurier/selgen-loss} (a versioned archive will be
+deposited at Zenodo, DOI to be assigned). The sorghum case-study data
+(Section~\nameref{sec:res-sorghum}) are proprietary and not redistributed; all other
+datasets are public and download automatically.
+
+\input{sec_results_g3.tex}
+
+\input{sec_sorghum_g3.tex}
+
+\input{discussion_body_g3.tex}
+
+\section{Conclusion}
+A standardized-MSE Pearson loss aligns neural-network training with the
+predictive-ability metric used throughout genomic prediction; because correlation
+is scale-free, affine calibration or a hybrid loss is required when calibrated
+phenotypic values matter; and for breeding decisions, global correlation should
+be complemented by top-$k$ and ranking-aware metrics. Empirically, across 101
+trait--datasets the benefit of correlation-consistent training is real but
+architecture-dependent --- substantial for CNNs and Transformers, negligible for a
+well-tuned MLP --- and on these benchmarks no neural loss unseated GBLUP or ridge
+on mean rank. The framework is thus a principled, well-characterized tool to be
+applied judiciously, not a universal replacement for MSE.
+
+% Full-width figure floats (span both columns)
+
+\begin{figure*}[tbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\includegraphics[width=\linewidth]{figures/fig1_geometry.pdf}
+\caption{Geometry of the standardized-MSE / Pearson identity (Proposition~\ref{prop:1}).}
+\label{fig:geometry}
+\end{figure*}
+
+\begin{figure*}[tbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\includegraphics[width=\linewidth]{figures/fig2_simulation.pdf}
+\caption{Controlled simulation of Proposition~\ref{prop:2}: a well-correlated but
+mis-scaled prediction (left) is corrected by affine calibration (middle) ---
+RMSE falls while Pearson $r$ is unchanged --- and the top-$20\%$ selection
+overlap is identical before and after (right).}
+\label{fig:simulation}
+\end{figure*}
+
+\begin{figure*}[tbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\includegraphics[width=\linewidth]{figures/fig3_datasets.pdf}
+\caption{Dataset map: size, dimensionality and predictability across species.}
+\label{fig:datasets}
+\end{figure*}
+
+\begin{figure*}[tbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\includegraphics[width=\linewidth]{figures/fig4_loss_comparison.pdf}
+\caption{Loss comparison: $\Delta$ versus MSE for Pearson, hybrid and CCC losses.}
+\label{fig:loss}
+\end{figure*}
+
+\begin{figure*}[tbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\includegraphics[width=\linewidth]{figures/fig5_calibration.pdf}
+\caption{Affine calibration restores scale and offset while leaving Pearson unchanged.}
+\label{fig:calibration}
+\end{figure*}
+
+\begin{figure*}[tbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\includegraphics[width=\linewidth]{figures/fig6_meta.pdf}
+\caption{When does correlation-consistent training help?}
+\label{fig:meta}
+\end{figure*}
+
+% Full-width table (spans both columns)
+\begin{table*}[htbp]
+\renewcommand{\familydefault}{\sfdefault}\normalfont
+\centering
+\caption{\bf The 101 trait--dataset combinations across 12 species (10 from EasyGeSe,
+plus CIMMYT wheat and SoyNAM). $n$ is the number of genotypes, $p$ the markers used
+(after MAF filtering and the 20{,}000-marker variance cap), and GBLUP $r$ the mean
+within-dataset predictive ability of GBLUP (a difficulty index).}
+\label{tab:datasets}
+\begin{tableminipage}{\textwidth}
+\begin{tabularx}{\textwidth}{Xrrrrl}
+\hline
+\header Species & $n$ & $p$ & traits & GBLUP $r$ & source\\
+\hline
+rice & 352 & 20{,}000 & 36 & 0.46 & EasyGeSe \\
+pine & 925 & 4{,}421 & 17 & 0.82 & EasyGeSe \\
+wheatG & 371 & 12{,}546 & 16 & 0.59 & EasyGeSe \\
+maize & 4421 & 20{,}000 & 6 & 0.83 & EasyGeSe \\
+bean & 444 & 16{,}707 & 5 & 0.57 & EasyGeSe \\
+lentil & 324 & 20{,}000 & 5 & 0.79 & EasyGeSe \\
+soybeanNAM & 5487 & 4{,}401 & 4 & 0.71 & SoyNAM \\
+wheat & 599 & 1{,}279 & 4 & 0.46 & BGLR/CIMMYT \\
+barley & 1438 & 20{,}000 & 2 & 0.58 & EasyGeSe \\
+oyster & 372 & 20{,}000 & 2 & 0.38 & EasyGeSe \\
+pig & 1709 & 20{,}000 & 2 & 0.31 & EasyGeSe \\
+soybean & 346 & 20{,}000 & 2 & 0.40 & EasyGeSe \\
+\hline
+\end{tabularx}
+\end{tableminipage}
+\end{table*}
+
+\bibliography{refs}
+
+\end{document}

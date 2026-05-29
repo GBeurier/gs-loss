@@ -20,14 +20,14 @@ results/analysis/lmm_long.csv
 *.log
 _*.log
 
-# LaTeX build artifacts (the compiled paper/main.pdf is kept)
-paper/*.aux
-paper/*.out
-paper/*.bbl
-paper/*.blg
-paper/*.synctex.gz
-paper/*.fls
-paper/*.fdb_latexmk
+# LaTeX build artifacts (compiled PDFs are kept)
+*.aux
+*.out
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
 paper/_wf_*.tex
 
 # OS
