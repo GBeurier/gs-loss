@@ -16,6 +16,10 @@ scratch/
 # Raw result arrays and big tables are regenerable; we keep the small analysis
 # summaries (results/analysis/*.csv), figures, exp_a.json and tuned HPO configs.
 results/*.parquet
+# but DO deposit the public-data result tables so every reported number is reproducible
+!results/results_main_full.parquet
+!results/results_batch_full.parquet
+!results/results_splits_full.parquet
 results/analysis/lmm_long.csv
 *.log
 _*.log

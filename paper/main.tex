@@ -248,6 +248,12 @@ pig & 1709 & 20{,}000 & 2 & 0.31 & EasyGeSe \\
 soybean & 346 & 20{,}000 & 2 & 0.40 & EasyGeSe \\
 \bottomrule
 \end{tabular}
+
+\vspace{2pt}
+{\footnotesize\raggedright The 12 species/sources count treats related germplasm
+sharing a common crop as distinct panels: wheatG (EasyGeSe) and wheat (CIMMYT) are
+separate sources, as are soybean (EasyGeSe) and soybeanNAM (SoyNAM)
+panels of the same species drawn from different sources.\par}
 \end{table}
 
 \begin{figure}[tbp]\centering
@@ -279,7 +285,7 @@ three post-hoc maps: raw (identity), affine (Proposition~\ref{prop:2}) and
 isotonic. Calibrators are fit on validation predictions only.
 
 \paragraph{Cross-validation.} We use the fixed EasyGeSe partitions (5 folds
-$\times$ 3 repeats), repeated $K$-fold for wheat and SoyNAM, leave-family-out for
+$\times$ 2 repeats $=$ 10 folds per trait), repeated $K$-fold for wheat and SoyNAM, leave-family-out for
 SoyNAM, and cross-environment transfer for wheat. Within each training fold an
 inner 80/20 split (group-aware for family CV) provides early-stopping and
 calibration data; markers are standardized with training statistics only;

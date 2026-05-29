@@ -97,7 +97,8 @@ predictions, a fold whose validation covariance is negative yields a
 correlation. This is rare but not absent: $90$ of $9{,}943$ fold-level cells
 ($0.91\%$) flip the sign of Pearson $r$ between raw and affine predictions, with
 per-fold $|r_{\mathrm{raw}}-r_{\mathrm{affine}}|$ as large as $0.89$ in those
-degenerate folds. The categorical statement that affine calibration preserves
+degenerate folds (all of these fold-level counts are computed from the deposited
+\texttt{results\_main\_full.parquet}). The categorical statement that affine calibration preserves
 every correlation therefore holds only when $a^\star>0$ (almost always; fewer than
 $1\%$ of folds flip), and we qualify it accordingly; the mean-level claim
 ($0.531\!\to\!0.533$) is unaffected.
@@ -219,23 +220,21 @@ without materially increasing cost.
 A confirmatory linear mixed model, fitted on the affine-calibrated predictions
 with MSE as the reference level and random intercepts for dataset and
 dataset:trait, summarizes the average effect of each loss
-(Figure~\ref{fig:meta}). For predictive ability, every correlation loss has a
-positive, CI-excluding-zero fixed effect: $+0.0389$ for the Pearson loss
-($[0.033,\,0.045]$, $t=12.7$), $+0.0412$ for the hybrid ($t=13.5$), and $+0.0448$
-for the CCC loss ($t=14.7$). These $t$-statistics should not be read as the model
-treating $10{,}040$ independent observations: the LMM is fitted on $1{,}004$
-(dataset, trait, model, loss) cells, each contributing $10$ fold-level rows ($5$
-folds $\times$ $2$ repeats) that reuse the same tuned architecture and overlapping
-training data and are therefore not independent. As a sensitivity check we refit
-with an additional per-cell random intercept; this inflates the standard error of
-the Pearson-loss coefficient by about $1.75\times$ ($0.0031\to0.0054$) and reduces
-$t$ from $12.7$ to $7.2$, but the coefficient ($+0.0387$) and its $95\%$ CI
-($[0.028,\,0.049]$) still exclude zero. Aggregating instead to a single value per
-cell before fitting gives the same conclusion (Pearson $+0.038$,
-$[0.028,\,0.049]$; NDCG@$10$ $+0.016$, $[0.011,\,0.021]$). The loss CIs for
-correlation and ranking thus survive correction for pseudoreplication, but the
-nominal precision of the uncorrected model is overstated and should be read with
-this caution; the model also reports no denominator-$df$-based $p$-values, so we
+(Figure~\ref{fig:meta}). To avoid fold-level pseudoreplication we fit the model on
+cell-aggregate values --- one row per (dataset, trait, model, loss) cell, $n=1{,}004$
+cells (the cell-level table is \texttt{results/analysis/lmm\_long.csv}, $1{,}004$
+rows per calibration) --- rather than on the $10{,}040$ NN affine fold-rows
+deposited in \texttt{results\_main\_full.parquet}; fitting at the fold level would
+treat the $10$ fold-level rows per cell ($5$ folds $\times$ $2$ repeats), which
+reuse the same tuned architecture and overlapping training data, as independent and
+would overstate precision. For predictive ability, every correlation loss has a
+positive, CI-excluding-zero fixed effect: $+0.0384$ for the Pearson loss
+($[0.028,\,0.049]$, $t=7.11$), $+0.0412$ for the hybrid ($[0.031,\,0.052]$,
+$t=7.63$), and $+0.0438$ for the CCC loss ($[0.033,\,0.054]$, $t=8.12$). These are
+the reported loss effects: the cell-aggregate model is our primary LMM precisely
+because it does not inflate the effective sample size. The loss CIs for correlation
+and ranking thus exclude zero after the model already accounts for
+pseudoreplication; the model reports no denominator-$df$-based $p$-values, so we
 rely on the CIs.
 
 Two structural caveats bound the model's interpretation. First, the
@@ -255,8 +254,9 @@ groups, not a contrast between structured and random splitting, and it carries n
 loss$\times$scheme interaction; the leave-family-out and cross-environment
 contrasts are not levels of this factor and live entirely in the separate splits
 experiment (Section~\ref{sec:res-splits}). The NDCG@$10$ model tells the same
-story with smaller coefficients (Pearson $+0.0164$, hybrid $+0.0174$, CCC
-$+0.0174$, all CIs excluding zero; MLP $+0.024$, Transformer $-0.010$). By
+story with smaller coefficients (Pearson $+0.0161$, $t=6.09$; hybrid $+0.0173$,
+$t=6.52$; CCC $+0.0173$, $t=6.51$; all CIs excluding zero; MLP $+0.024$,
+Transformer $-0.010$). By
 contrast, the RMSE mixed model finds \emph{no} reliable loss effect after affine
 calibration: the Pearson ($-0.010$), hybrid ($+0.006$) and CCC ($-0.057$)
 coefficients all have intervals spanning zero, whereas the architecture effects

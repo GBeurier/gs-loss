@@ -19,7 +19,7 @@ Reproducible: fixed seeds, fixed CV folds, public data, pinned env.
 ## Datasets (all public, reproducible)
 - **EasyGeSe** (Quesada-Traver 2025, Zenodo 15348871): 10 species — barley, bean, lentil, maize,
   oyster, pig, pine, rice, soybean, wheatG — 93 trait columns total, 0/1/2 genotypes, **predefined
-  5-fold × 5-repeat CV partitions** (we use 3 repeats = 15 folds).
+  5-fold × 5-repeat CV partitions** (we use 2 repeats = 10 folds per trait).
 - **CIMMYT wheat** (Crossa 2010, BGLR): 599 lines, 1279 DArT (0/1), grain yield in 4 environments
   → cross-environment transfer (Exp F).
 - **SoyNAM** (Xavier 2016, R pkg): ~5500 RILs, 40 biparental families, traits yield/height/protein/oil

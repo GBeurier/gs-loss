@@ -9,7 +9,9 @@ this has been used implicitly wherever a correlation or cosine objective is
 optimized. Correlation-, concordance- and ranking-based training objectives also
 already exist in both the statistical-genetics and machine-learning literatures:
 Lin's concordance correlation \citep{lin1989} has long served as a
-scale-and-offset-aware agreement criterion, \citet{blondel2015} reframed genomic
+scale-and-offset-aware agreement criterion --- and its many-to-many relationship
+to the mean squared error, which the CCC loss exploits, has been characterized
+explicitly \citep{pandit2019} --- \citet{blondel2015} reframed genomic
 selection as a learning-to-rank problem with NDCG, and a recent convolutional
 genomic-prediction architecture substitutes a family of $L_p$ correlation-style
 losses for MSE \citep{pnngs2024} --- although, as we note in the introduction, it
@@ -36,9 +38,10 @@ Spearman $\rho$ ($+0.037$, $[0.028,0.048]$) and in NDCG@10 ($+0.016$,
 $[0.011,0.021]$) --- but it is not the best loss, and the gain is concentrated in
 a subset of architectures. The concordance-correlation loss ($\Delta r = +0.044$,
 $[0.034,0.056]$) and the hybrid loss ($+0.041$, $[0.031,0.052]$) both edge out the
-pure Pearson loss on essentially every metric we examined; the three
-correlation-aware objectives are statistically separable from MSE but only
-marginally separable from one another (Figure~\ref{fig:loss}). The pooled
+pure Pearson loss on most predictive and ranking metrics (the high-variance
+selection differential is an exception, where the hybrid interval includes zero);
+the three correlation-aware objectives are statistically separable from MSE but
+only marginally separable from one another (Figure~\ref{fig:loss}). The pooled
 $n=\NUM{251}$ figure is, however, an \emph{unweighted} average over an
 architecturally unbalanced set of cells, and this must be kept in view: the CNN
 and MLP were each run on all \NUM{101} trait--datasets, but the Transformer was
@@ -48,27 +51,32 @@ per-architecture effect, the pooled mean is pulled upward by a smaller,
 non-random subset of datasets, and per-architecture effects are not estimated on a
 common dataset base. The stratified estimates make the heterogeneity explicit: the
 gain is large for the Transformer ($\Delta r = +0.101$, $[0.071,0.131]$, on its
-\NUM{49}-dataset subset) and the 1D-CNN ($+0.044$, $[0.026,0.066]$) yet vanishes
-for the MLP ($+0.0027$, $[-0.0004,0.0055]$), whose confidence interval includes
-zero and whose CCC effect is frankly null ($+0.0004$, $p_{\mathrm{Holm}}=0.17$).
+\NUM{49}-dataset subset) and the 1D-CNN ($+0.044$, $[0.026,0.066]$) yet is small
+on the MLP and, for the Pearson and CCC losses, not robust: the Pearson-loss MLP
+effect is $+0.0027$ ($[-0.0004,0.0055]$, confidence interval including zero) and
+the CCC-loss MLP effect is null ($+0.0004$, $p_{\mathrm{Holm}}=0.17$), whereas the
+hybrid-loss MLP effect, while small, is significant ($+0.0044$,
+$p_{\mathrm{Holm}}=0.0018$). The MLP benefit is therefore small and, for Pearson
+and CCC, not robust, rather than uniformly negligible.
 
 The confirmatory mixed model is consistent with this picture but must be read for
 what it actually estimates. It is additive in $\mathrm{loss}+\mathrm{model}+
 \mathrm{scheme}$, with no $\mathrm{loss}\times\mathrm{model}$ interaction, so the
-Pearson-loss fixed effect ($+0.039$, $[0.033,0.045]$) is an average loss effect
-and the model terms are \emph{baseline} contrasts, not moderators. The
+Pearson-loss fixed effect ($+0.038$, $[0.028,0.049]$, $t=7.11$) is an average loss
+effect and the model terms are \emph{baseline} contrasts, not moderators. The
 $\mathrm{model}_{\mathrm{MLP}}=+0.060$ coefficient means the MLP has the highest
 intrinsic accuracy among the three networks (relative to the CNN reference), not
 that architecture modulates the loss benefit; the genuine evidence for moderation
 is the stratified per-model $\Delta$ above (Transformer $+0.101$ versus MLP
-$+0.0027$), which is what we rely on when we say architecture dominates. The model
-also reports very tight loss intervals ($t\approx12$--$15$); these should be read
-with caution, because the random-effects structure is $(1\,|\,\mathrm{dataset})+
-(1\,|\,\mathrm{dataset{:}trait})$ with no term for the ten within-cell folds
-(\NUM{5} folds $\times$ \NUM{2} repeats), which reuse the same frozen architecture
-and overlapping markers and are therefore not independent. The unstratified
-per-cell BCa intervals above, which aggregate to one $\Delta$ per cell, are the
-estimates we treat as primary.
+$+0.0027$), which is what we rely on when we say architecture dominates. We fit the
+model on cell-aggregate values --- one row per dataset$\times$trait$\times$model$
+\times$loss cell, $n=\NUM{1004}$ cells --- precisely so that the loss intervals are
+not inflated by the ten within-cell folds (\NUM{5} folds $\times$ \NUM{2} repeats),
+which reuse the same frozen architecture and overlapping markers and are therefore
+not independent; a naive fold-level fit would treat the $10{,}040$ fold-rows as
+independent and overstate precision. The cell-level mixed model and the unstratified
+per-cell BCa intervals above, which aggregate to one $\Delta$ per cell, agree and
+are the estimates we treat as primary.
 
 The blunter reading is that none of the neural predictors, under any loss, was
 competitive with the simple parametric baselines on these data. By mean rank
@@ -147,7 +155,7 @@ the Transformer ($-0.119$). Only the CCC loss --- which penalizes scale and offs
 \emph{inside} the objective rather than after it --- delivers a consistent pooled
 calibrated-RMSE reduction ($-0.057$, $[-0.133,-0.027]$, CI excluding zero), and
 even that is driven by the CNN and Transformer. The confirmatory model agrees that
-the Pearson-loss effect on calibrated RMSE is null ($-0.010$, $t=-0.17$, CI
+the Pearson-loss effect on calibrated RMSE is null ($-0.010$, $t=-0.15$, CI
 spanning zero). In short, once predictions are correctly calibrated, the choice of
 correlation loss buys ranking quality, not magnitude accuracy; if calibrated
 magnitude is the explicit goal, the CCC loss is the better starting point.

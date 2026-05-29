@@ -27,18 +27,25 @@ mismatch explicit and resolvable, and contributes:
    101 trait–dataset combinations from 12 species, with architectures, splits and
    tuning budgets held fixed so that only the loss changes.
 
-Our central finding is deliberately nuanced: *[HEADLINE RESULT — filled from the
-analysis: e.g., correlation-consistent training matches or improves predictive
-ability and, after affine calibration, recovers calibrated phenotypic scale,
-with selection-metric effects that depend on data and split type].* We therefore
-provide a principled, reproducible framework — rather than a claim that one loss
-universally wins.
+Our central finding is deliberately nuanced. Holding architecture, splits and
+tuning fixed so that only the loss changes, correlation-consistent and CCC losses
+improve predictive ability (Δr ≈ +0.04, Holm-corrected paired Wilcoxon p<10⁻⁷) and
+selection-aware metrics (NDCG@10, relative efficiency) over MSE; but the benefit is
+strongly architecture-dependent (large for the Transformer and CNN, negligible for
+the MLP), only the concordance loss reliably improves calibrated RMSE, and no neural
+loss unseats GBLUP or ridge on mean rank. We therefore provide a principled,
+reproducible framework — and an honest map of when it helps — rather than a claim
+that one loss universally wins.
 
 This work fits *G3*'s scope for computational tools and statistical methodology
-for genomic prediction. All datasets are public (EasyGeSe; the CIMMYT wheat panel;
-the SoyNAM population), and we release the complete software (`ccgp`), the exact
-cross-validation partitions, tuned configurations and a pinned environment, so
-that every result is reproducible. A preprint is available at *[URL/DOI]*.
+for genomic prediction. All benchmark datasets are public (EasyGeSe; the CIMMYT
+wheat panel; the SoyNAM population), and we release the complete software (`ccgp`),
+the raw and aggregated results, the exact cross-validation partitions, tuned
+configurations and a pinned environment at <https://github.com/GBeurier/selgen-loss>,
+so that every reported number is reproducible; a versioned archive will be deposited
+at Zenodo (reserved DOI to be inserted at submission). Per *G3*'s initial-submission
+policy any format is accepted; a manuscript prepared in the official GSA G3 template
+is also provided (`paper/g3/`).
 
 The manuscript is original, not under consideration elsewhere, and all authors
 approve submission. We declare no competing interests.
