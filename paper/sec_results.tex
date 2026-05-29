@@ -36,7 +36,7 @@ $p_{\mathrm{Holm}}=4.4\times10^{-11}$), and the CCC loss by $+0.044$
 correlation moves almost identically ($+0.037$ to $+0.043$), and $R^2$ rises
 modestly ($+0.015$ to $+0.025$, all CIs excluding zero). This pool is, however,
 \emph{architecturally unbalanced}: the CNN and the MLP were each run on all 101
-trait-datasets (12 species), whereas the Transformer --- which carries the
+trait-datasets (12 panels/sources, 10 species), whereas the Transformer --- which carries the
 largest per-model effect (see below) --- was run on only 49 trait-datasets across
 four species (lentil, maize, rice, soybean), giving $101+101+49=251$. The pooled
 $\Delta$ is therefore an unweighted average over cells that differ in
@@ -147,10 +147,13 @@ win: ridge regression has the best mean rank for both Pearson ($2.85$) and
 NDCG@$10$ ($4.01$), followed by GBLUP ($3.45$ and $4.32$). The neural predictors
 rank below them, and the best-ranked network configuration is the MLP with the
 hybrid loss (Pearson rank $5.28$, NDCG@$10$ rank $4.80$). Within every neural
-architecture, however, the MSE loss is consistently the worst-ranked variant
-(e.g.\ MLP: hybrid $5.28 <$ Pearson $5.47 <$ CCC $5.62 <$ MSE $6.14$; CNN and
-Transformer show the same ordering, with the MSE Transformer last overall at
-$12.67$). We note that these are \emph{absolute} ranks, so the shared-HPO
+architecture, however, MSE is consistently the worst-ranked loss (e.g.\ MLP:
+hybrid $5.28 <$ Pearson $5.47 <$ CCC $5.62 <$ MSE $6.14$, with the MSE
+Transformer last overall at $12.67$). The ordering \emph{among} the three
+correlation losses, by contrast, differs by architecture: for the MLP it is
+hybrid $<$ Pearson $<$ CCC, for the CNN it is CCC ($6.47$) $<$ hybrid ($7.22$)
+$<$ Pearson ($7.93$), and for the Transformer it is CCC ($8.57$) $<$ Pearson
+($9.67$) $<$ hybrid ($9.88$). We note that these are \emph{absolute} ranks, so the shared-HPO
 optimism that may mildly inflate absolute neural accuracies works in favor of the
 neural nets here; the linear-baselines-win conclusion is therefore conservative,
 since the bias runs against it. The honest reading is that correlation-consistent
@@ -165,14 +168,20 @@ the main grid: the leave-family-out (SoyNAM) and random contrasts each rest on
 only $n=4$ datasets with no $p$-values reported, and the cross-environment
 contrast rests on $n=12$ paired comparisons that are themselves non-independent
 ($4$ wheat environments yield $12$ ordered transfer pairs on the same $599$
-lines). These results should therefore be read as suggestive and underpowered
+lines). A further structural limitation is that every splits loss-contrast here
+comes from the MLP: in the splits experiment the CNN was run only with the Pearson
+loss and had no MSE baseline, so a $\Delta$-vs-MSE could be formed for the MLP
+alone --- the architecture with the \emph{smallest} benefit under random CV. The
+splits contrasts therefore most likely understate the CNN and Transformer effect.
+These results should therefore be read as suggestive and underpowered
 rather than confirmatory. Under random $K$-fold CV the Pearson loss gives a small
-gain in predictive ability ($\Delta r=+0.0041$, BCa CI $[0.0004,\,0.0080]$),
+gain in predictive ability ($\Delta r=+0.0041$, percentile-bootstrap CI $[0.0004,\,0.0080]$;
+the splits CIs at $n=4$ use the percentile bootstrap, not BCa --- see Methods),
 matched by the hybrid loss ($+0.0040$, $[0.0009,\,0.0072]$). Under the harder,
 breeding-relevant schemes the gain shrinks or reverses. For SoyNAM
 leave-family-out prediction the Pearson loss \emph{lowers} predictive ability
 ($\Delta r=-0.0030$, $[-0.0106,\,0.0010]$) and the family NDCG@$10$ contrast is
-negative with a BCa interval that excludes zero ($-0.0042$, $[-0.0089,\,-0.0005]$);
+negative with a percentile-bootstrap interval that excludes zero ($-0.0042$, $[-0.0089,\,-0.0005]$);
 we describe this as a suggestive degradation rather than a significant one, since
 it is a single bootstrap interval over $4$ paired observations with no $p$-value
 and no correction across the roughly twenty split contrasts examined. The hybrid

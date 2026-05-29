@@ -24,7 +24,7 @@ mismatch explicit and resolvable, and contributes:
    the correlation and all rankings unchanged.
 3. **Selection-aware evaluation** (top-$k$ overlap, NDCG@$k$, selection
    differential, relative efficiency) alongside the usual metrics, across
-   101 trait–dataset combinations from 12 species, with architectures, splits and
+   101 trait–dataset combinations from 12 panels/sources spanning 10 species, with architectures, splits and
    tuning budgets held fixed so that only the loss changes.
 
 Our central finding is deliberately nuanced. Holding architecture, splits and

@@ -29,7 +29,7 @@
 \runningauthor{Beurier \textit{et al.}}
 
 \begin{abstract}
-Genomic prediction models are trained almost universally to minimize the mean squared error (MSE), yet they are evaluated, and used for selection, by the Pearson correlation $r$ between predicted and observed phenotypes and by genotype ranking. That maximizing $r$ equals minimizing the MSE of standardized variables, $\mathrm{MSE}(z_y,z_{\hat y})=2(1-r)$, is elementary, and correlation, concordance (CCC) and ranking losses have been used before; our contribution is a systematic, calibration-aware and selection-metric-aware empirical characterization of these losses for genomic prediction across 101 trait--dataset combinations from 12 panels/sources spanning 10 species (EasyGeSe, CIMMYT wheat, SoyNAM), with a closed-form affine recalibration. We use it only as a stable training target; the same scale and offset invariance lets one affine map restore magnitude (residual variance $\sigma_y^2(1-r^2)$), leaving $r$ and all rankings unchanged whenever the validation-fitted affine map is increasing, which holds in $>99\%$ of folds (the test $r$-sign flips in only $0.90\%$). Holding architecture, splits and tuning fixed so that only the loss differs, and comparing each architecture against its own MSE baseline, correlation and CCC losses raised predictive ability (cell-level $\Delta r$ from $+0.038$ to $+0.044$; Holm-corrected paired Wilcoxon $p<10^{-7}$, corroborated by a linear mixed model whose confidence intervals exclude zero) and selection metrics (NDCG@10 $+0.016$; relative efficiency $+0.04$). The benefit is strongly architecture-dependent --- large for the Transformer and CNN, negligible for the multilayer perceptron --- and among the losses only CCC reliably lowered pooled calibrated RMSE. No neural loss unseated the GBLUP or ridge baselines on mean rank. Correlation-consistent training is thus a useful, well-characterized tool, not a universal replacement for MSE.
+Genomic prediction models are trained almost universally to minimize the mean squared error (MSE), yet they are evaluated, and used for selection, by the Pearson correlation $r$ between predicted and observed phenotypes and by genotype ranking. That maximizing $r$ equals minimizing the MSE of standardized variables, $\mathrm{MSE}(z_y,z_{\hat y})=2(1-r)$, is elementary, and correlation, concordance (CCC) and ranking losses have been used before; our contribution is a systematic, calibration- and selection-metric-aware empirical characterization of these losses across 101 trait--dataset combinations from 12 panels/sources spanning 10 species (EasyGeSe, CIMMYT wheat, SoyNAM), with a closed-form affine recalibration. We use it only as a stable training target; one affine map restores scale and offset, leaving $r$ and all rankings unchanged whenever the validation-fitted map is increasing, which holds in $>99\%$ of folds ($r$-sign flips in only $0.91\%$). Holding architecture, splits and tuning fixed so that only the loss differs, and comparing each architecture against its own MSE baseline, correlation and CCC losses raised predictive ability (cell-level $\Delta r$ from $+0.038$ to $+0.044$; Holm-corrected paired Wilcoxon $p<10^{-7}$, corroborated by a mixed model whose confidence intervals exclude zero) and selection metrics (NDCG@10 $+0.016$; relative efficiency $+0.04$). The benefit is strongly architecture-dependent --- large for the Transformer and CNN, negligible for the MLP. Only CCC lowered pooled calibrated RMSE in the per-cell bootstrap (not corroborated by the mixed model). No neural loss unseated the GBLUP or ridge baselines on mean rank. Correlation-consistent training is thus a useful, well-characterized tool, not a universal replacement for MSE.
 \end{abstract}
 
 \begin{document}
@@ -207,7 +207,8 @@ environments, used for cross-environment transfer. (iii) \emph{SoyNAM}
 families, used for leave-family-out prediction. Genotypes are coded as allele
 dosages; preprocessing (unsupervised, no phenotype) applies a minor-allele
 frequency filter ($\geq 0.01$), mean imputation, and a top-variance cap at
-20{,}000 markers for the two ultra-high-dimensional panels.
+20{,}000 markers for the seven panels whose marker count exceeded 20{,}000
+(barley, lentil, maize, oyster, pig, rice and soybean).
 Table~\ref{tab:datasets} and Figure~\ref{fig:datasets} summarize the data.
 
 \subsection{Models}
@@ -215,8 +216,7 @@ The parametric baseline is GBLUP with REML-estimated variance
 components, implemented in the spectral basis of the linear genomic kernel
 $K=XX^\top/p$ and validated against the \texttt{rrBLUP} package
 \citep{endelman2011} to floating-point precision (cross-implementation
-correlation $1.0000$). We also include ridge regression, elastic net, random
-forest and gradient-boosted trees \citep{chen2016xgboost}. The neural predictors
+correlation $1.0000$). We also include ridge regression as a linear baseline. The neural predictors
 are a multilayer perceptron (MLP), a one-dimensional convolutional network over
 ordered markers (1D-CNN), and a light Transformer over marker patches. Crucially,
 \emph{the architecture is held fixed across losses}: it is tuned once per
@@ -257,7 +257,9 @@ gain divided by the oracle gain).
 \subsection{Statistical Analysis}
 For each cell we average over folds and form
 $\Delta m = m_{\mathrm{loss}}-m_{\mathrm{MSE}}$ within the same architecture.
-We report bootstrap (BCa) confidence intervals, paired Wilcoxon tests with
+We report bootstrap confidence intervals (bias-corrected and accelerated, BCa,
+when $n\geq12$; the percentile bootstrap otherwise, as for the $n=4$ split and
+$n=8$ sorghum contrasts), paired Wilcoxon tests with
 Holm and Benjamini--Hochberg \citep{benjamini1995} correction, and mean method
 ranks. As a corroborative analysis we fit a linear mixed model
 \citep{bates2015lme4} on cell-level means (one observation per
@@ -270,7 +272,7 @@ scheme is confounded with dataset source; difficult-split generalization is
 addressed directly in Section~\nameref{sec:res-splits}.)
 The framework is released as the Python package
 \texttt{ccgp}, built on PyTorch \citep{paszke2019pytorch}, scikit-learn
-\citep{pedregosa2011sklearn}, XGBoost \citep{chen2016xgboost} and NumPy
+\citep{pedregosa2011sklearn} and NumPy
 \citep{harris2020numpy}, with the neural networks trained using the Adam optimizer
 \citep{kingma2015adam}, fixed seeds, the exact CV
 partitions, tuned configurations and a pinned environment. \emph{Limitation:}
@@ -365,8 +367,8 @@ overlap is identical before and after (right).}
 \begin{table*}[htbp]
 \renewcommand{\familydefault}{\sfdefault}\normalfont
 \centering
-\caption{\bf The 101 trait--dataset combinations across 12 species (10 from EasyGeSe,
-plus CIMMYT wheat and SoyNAM). $n$ is the number of genotypes, $p$ the markers used
+\caption{\bf The 101 trait--dataset combinations across 12 panels/sources (10 species;
+10 panels from EasyGeSe, plus CIMMYT wheat and SoyNAM). $n$ is the number of genotypes, $p$ the markers used
 (after MAF filtering and the 20{,}000-marker variance cap), and GBLUP $r$ the mean
 within-dataset predictive ability of GBLUP (a difficulty index).}
 \label{tab:datasets}
@@ -391,7 +393,8 @@ soybean & 346 & 20{,}000 & 2 & 0.40 & EasyGeSe \\
 \end{tabularx}
 
 \vspace{2pt}
-{\footnotesize\raggedright The 12 species/sources count treats related germplasm
+{\footnotesize\raggedright The count of 12 panels/sources (spanning 10 species)
+treats related germplasm
 sharing a common crop as distinct panels: wheatG (EasyGeSe) and wheat (CIMMYT) are
 separate sources, as are soybean (EasyGeSe) and soybeanNAM (SoyNAM)
 panels of the same species drawn from different sources.\par}

@@ -222,12 +222,13 @@ environments, used for cross-environment transfer. (iii) \emph{SoyNAM}
 families, used for leave-family-out prediction. Genotypes are coded as allele
 dosages; preprocessing (unsupervised, no phenotype) applies a minor-allele
 frequency filter ($\geq 0.01$), mean imputation, and a top-variance cap at
-20{,}000 markers for the two ultra-high-dimensional panels.
+20{,}000 markers for the seven panels whose marker count exceeded 20{,}000
+(barley, lentil, maize, oyster, pig, rice and soybean).
 Table~\ref{tab:datasets} and Figure~\ref{fig:datasets} summarize the data.
 
 \begin{table}[t]\centering
-\caption{The 101 trait--dataset combinations across 12 species (10 from EasyGeSe,
-plus CIMMYT wheat and SoyNAM). $n$ is the number of genotypes, $p$ the markers used
+\caption{The 101 trait--dataset combinations across 12 panels/sources (10 species;
+10 panels from EasyGeSe, plus CIMMYT wheat and SoyNAM). $n$ is the number of genotypes, $p$ the markers used
 (after MAF filtering and the 20{,}000-marker variance cap), and GBLUP $r$ the mean
 within-dataset predictive ability of GBLUP (a difficulty index).}\label{tab:datasets}
 \begin{tabular}{lrrrrl}
@@ -250,7 +251,8 @@ soybean & 346 & 20{,}000 & 2 & 0.40 & EasyGeSe \\
 \end{tabular}
 
 \vspace{2pt}
-{\footnotesize\raggedright The 12 species/sources count treats related germplasm
+{\footnotesize\raggedright The count of 12 panels/sources (spanning 10 species)
+treats related germplasm
 sharing a common crop as distinct panels: wheatG (EasyGeSe) and wheat (CIMMYT) are
 separate sources, as are soybean (EasyGeSe) and soybeanNAM (SoyNAM)
 panels of the same species drawn from different sources.\par}
@@ -266,8 +268,7 @@ panels of the same species drawn from different sources.\par}
 components, implemented in the spectral basis of the linear genomic kernel
 $K=XX^\top/p$ and validated against the \texttt{rrBLUP} package
 \citep{endelman2011} to floating-point precision (cross-implementation
-correlation $1.0000$). We also include ridge regression, elastic net, random
-forest and gradient-boosted trees \citep{chen2016xgboost}. The neural predictors
+correlation $1.0000$). We also include ridge regression as a linear baseline. The neural predictors
 are a multilayer perceptron (MLP), a one-dimensional convolutional network over
 ordered markers (1D-CNN), and a light Transformer over marker patches. Crucially,
 \emph{the architecture is held fixed across losses}: it is tuned once per
@@ -303,7 +304,9 @@ gain divided by the oracle gain).
 
 \paragraph{Statistical analysis.} For each cell we average over folds and form
 $\Delta m = m_{\mathrm{loss}}-m_{\mathrm{MSE}}$ within the same architecture.
-We report bootstrap (BCa) confidence intervals, paired Wilcoxon tests with
+We report bootstrap confidence intervals (bias-corrected and accelerated, BCa,
+when $n\geq12$; the percentile bootstrap otherwise, as for the $n=4$ split and
+$n=8$ sorghum contrasts), paired Wilcoxon tests with
 Holm and Benjamini--Hochberg \citep{benjamini1995} correction, and mean method
 ranks. As a corroborative analysis we fit a linear mixed model
 \citep{bates2015lme4} on cell-level means (one observation per
@@ -317,7 +320,7 @@ addressed directly in Section~\ref{sec:res-splits}.)
 
 \paragraph{Implementation.} The framework is released as the Python package
 \texttt{ccgp}, built on PyTorch \citep{paszke2019pytorch}, scikit-learn
-\citep{pedregosa2011sklearn}, XGBoost \citep{chen2016xgboost} and NumPy
+\citep{pedregosa2011sklearn} and NumPy
 \citep{harris2020numpy}, with the neural networks trained using the Adam optimizer
 \citep{kingma2015adam}, fixed seeds, the exact CV
 partitions, tuned configurations and a pinned environment. \emph{Limitation:}

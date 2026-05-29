@@ -2,7 +2,7 @@
 
 ## Package
 `ccgp` (Correlation-Consistent Genomic Prediction), MIT, Python 3.13, PyTorch 2.10+cu128,
-scikit-learn 1.8, xgboost 3.2. Two GPUs (RTX 4090 + 5090), 24 cores, 62 GB RAM.
+scikit-learn 1.8. Two GPUs (RTX 4090 + 5090), 24 cores, 62 GB RAM.
 Reproducible: fixed seeds, fixed CV folds, public data, pinned env.
 
 ## Theory (verified numerically — Exp A, results/exp_a.json)
@@ -24,17 +24,17 @@ Reproducible: fixed seeds, fixed CV folds, public data, pinned env.
   → cross-environment transfer (Exp F).
 - **SoyNAM** (Xavier 2016, R pkg): ~5500 RILs, 40 biparental families, traits yield/height/protein/oil
   → leave-family-out (Exp F).
-- Total **101 trait-datasets across 12 species/sources**.
+- Total **101 trait-datasets across 12 panels/sources spanning 10 species**.
 - Preprocessing (unsupervised, no phenotype): MAF ≥ 0.01, mean imputation, top-variance cap at
-  20,000 markers when p larger (maize/barley). Per-fold marker standardization uses **training
-  statistics only**.
+  20,000 markers when p larger (applies to seven panels: barley, lentil, maize, oyster, pig, rice,
+  soybean). Per-fold marker standardization uses **training statistics only**.
 
 ## Models
 - **GBLUP** — REML genomic BLUP via spectral decomposition of K=XX'/p, profiled restricted
   likelihood for the variance ratio δ, GLS intercept, BLUP `g_*=K_*(K+δI)^{-1}(y-μ)`.
   **VALIDATED vs R rrBLUP 4.6.3**: cross-implementation correlation **1.0000** (max pred diff
   1e-7), identical variance components (δ, μ, σ²_g, σ²_e).
-- Ridge, ElasticNet, RandomForest, XGBoost (HPO-tuned).
+- Ridge regression (HPO-tuned) as the linear baseline.
 - **MLP** (BN+ReLU+Dropout), **1D-CNN** (Conv1d over ordered SNPs), **TransformerLite** (SNP-patch
   tokens + encoder). Same architecture across losses (frozen by HPO with MSE).
 
@@ -59,7 +59,9 @@ or HPO. HPO: 12 random configs × 3 inner folds per (dataset, model), selected b
 the neutral MSE objective, then frozen and reused across all losses (keeps "only the loss changes").
 
 ## Statistics
-Δ(loss) = metric(loss) − metric(MSE) per cell; bootstrap BCa CIs; paired Wilcoxon; Holm + BH-FDR;
+Δ(loss) = metric(loss) − metric(MSE) per cell; bootstrap CIs (BCa for n≥12, percentile otherwise —
+e.g. the n=4 split contrasts and the n=8 sorghum contrast are percentile, per `ccgp/stats.py`);
+paired Wilcoxon; Holm + BH-FDR;
 mean method ranks; confirmatory LMM (lme4): `metric ~ loss + model + (1|dataset) +
 (1|dataset:trait)`, MSE as reference level.
 
