@@ -14,6 +14,11 @@
 \newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
 \newcommand{\NUM}[1]{#1} % filled from results
 
+% Preprint toggle: build with  pdflatex "\def\PREPRINTMODE{1}\input{main}"  for a
+% line-numbered bioRxiv preprint; default (0) is the clean submission build.
+\providecommand{\PREPRINTMODE}{0}
+\ifnum\PREPRINTMODE=1 \usepackage[switch]{lineno}\fi
+
 \theoremstyle{plain}
 \newtheorem{proposition}{Proposition}
 \theoremstyle{remark}
@@ -29,10 +34,11 @@ selection-aware evaluation}
 \author[1,2]{David Cros}
 \affil[1]{CIRAD, UMR AGAP Institut, Montpellier, France}
 \affil[2]{UMR AGAP Institut, Univ Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France}
-\date{\today}
+\date{\ifnum\PREPRINTMODE=1 \textit{Preprint --- not peer-reviewed} \quad\textbullet\quad \today\else\today\fi}
 
 \begin{document}
 \maketitle
+\ifnum\PREPRINTMODE=1 \linenumbers \fi
 
 \begin{abstract}
 \noindent

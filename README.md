@@ -72,9 +72,21 @@ ccgp/        losses, metrics, calibration, data, splits, models/, experiment, hp
 experiments/ run.py (Exp B–F driver), exp_a_numerical.py
 analysis/    analyze.py, lmm.R (lme4 mixed model)
 figures/     make_figures.py
-paper/       main.tex, refs.bib
+paper/       main.tex, refs.bib, cover_letter.md; g3/ (GSA G3 two-column build)
 tests/       unit tests
 ```
+
+## Manuscript builds
+
+| Build | File | How |
+|---|---|---|
+| Submission (single-column, figures inline) | `paper/main.pdf` | `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main` |
+| bioRxiv preprint (line-numbered) | `paper/main_preprint.pdf` | `pdflatex --jobname=main_preprint "\def\PREPRINTMODE{1}\input{main}"` (+ bibtex, ×2) |
+| Official GSA **G3** template (two-column) | `paper/g3/main_g3.pdf` | `cd paper/g3 && pdflatex main_g3 && bibtex main_g3 && pdflatex main_g3 && pdflatex main_g3` |
+
+The cover letter is `paper/cover_letter.md`. G3 accepts any format for initial
+submission; the `paper/g3/` build follows the official `gsag3jnl` template
+(`articletype{gs}`, Genomic Selection).
 
 ## License
 
