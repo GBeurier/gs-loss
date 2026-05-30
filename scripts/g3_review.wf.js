@@ -7,7 +7,7 @@ export const meta = {
   ],
 }
 
-const ROOT = '/home/delete/selgen-loss'
+const ROOT = '/home/delete/gs-loss'
 const SRC = `READ the manuscript and evidence before judging:
 - ${ROOT}/paper/main.tex (master: title, intro, Theory with Props 1-3, Methods, Conclusion, Table 1, figures)
 - ${ROOT}/paper/abstract_body.tex, ${ROOT}/paper/sec_results.tex, ${ROOT}/paper/sec_sorghum.tex, ${ROOT}/paper/discussion_body.tex

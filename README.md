@@ -18,13 +18,13 @@ makes the training objective consistent with that goal:
 3. **Selection-aware evaluation.** Top-k overlap, precision/recall@k, NDCG@k,
    selection differential and relative efficiency, alongside the usual metrics.
 
-Repository: <https://github.com/GBeurier/selgen-loss>
+Repository: <https://github.com/GBeurier/gs-loss>
 
 ## Install
 
 ```bash
-git clone https://github.com/GBeurier/selgen-loss.git
-cd selgen-loss
+git clone https://github.com/GBeurier/gs-loss.git
+cd gs-loss
 pip install -e .                 # core library (PyTorch, scikit-learn, xgboost, ...)
 # R (with BGLR, SoyNAM, rrBLUP, lme4) is used for the wheat/SoyNAM datasets and the
 # mixed-model analysis; EasyGeSe data download automatically from Zenodo.

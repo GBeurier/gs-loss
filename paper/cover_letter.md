@@ -41,7 +41,7 @@ This work fits *G3*'s scope for computational tools and statistical methodology
 for genomic prediction. All benchmark datasets are public (EasyGeSe; the CIMMYT
 wheat panel; the SoyNAM population), and we release the complete software (`ccgp`),
 the raw and aggregated results, the exact cross-validation partitions, tuned
-configurations and a pinned environment at <https://github.com/GBeurier/selgen-loss>,
+configurations and a pinned environment at <https://github.com/GBeurier/gs-loss>,
 so that every reported number is reproducible; a versioned archive will be deposited
 at Zenodo (reserved DOI to be inserted at submission). Per *G3*'s initial-submission
 policy any format is accepted; a manuscript prepared in the official GSA G3 template
