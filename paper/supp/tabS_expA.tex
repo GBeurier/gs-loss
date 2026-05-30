@@ -1,0 +1,18 @@
+\begin{table}[ht]
+\caption{Experiment A: numerical verification of the equivalences. Proposition~1 (standardized MSE equals $2(1-r)$) and Proposition~2 (the affine-optimal MSE identity) are confirmed to machine precision across randomized cases; analytic gradients of the Pearson and CCC losses pass \texttt{torch.autograd.gradcheck}; and the identity holds exactly on a real dataset. From \texttt{results/exp\_a.json}.}
+\label{tab:S-expA}
+\begin{tabular}{llrr}
+\toprule
+Check & Quantity & Value & $n$ \\
+\midrule
+Prop.\ 1: standardized-MSE $=2(1-r)$ & max abs.\ diff. & 5.02e-08 & 80 \\
+Prop.\ 1: standardized-MSE $=2(1-r)$ & mean abs.\ diff. & 7.38e-09 & 80 \\
+Prop.\ 2: affine-optimal MSE identity & max abs.\ diff. & 1.19e-15 & 200 \\
+Prop.\ 2: affine-optimal MSE identity & mean abs.\ diff. & 1.80e-16 & 200 \\
+Gradient check (Pearson loss) & \texttt{gradcheck} passes & yes & -- \\
+Gradient check (CCC loss) & \texttt{gradcheck} passes & yes & -- \\
+Neg-Pearson gradient vs analytic & max grad.\ diff. & 0.00e+00 & -- \\
+Real data identity (lentil/DTF, $r=0.868$) & abs.\ diff.\ (identity) & 0.00e+00 & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

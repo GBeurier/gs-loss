@@ -1,0 +1,14 @@
+\contentsline {section}{\numberline {1}Numerical verification of the equivalences (Experiment A)}{2}{section.1}%
+\contentsline {section}{\numberline {2}Hyper-parameter search spaces and selected configurations}{2}{section.2}%
+\contentsline {section}{\numberline {3}Full $\Delta $-versus-MSE tables}{5}{section.3}%
+\contentsline {section}{\numberline {4}Confirmatory mixed-effects models}{12}{section.4}%
+\contentsline {paragraph}{Response: Pearson $r$.}{12}{section*.4}%
+\contentsline {paragraph}{Response: NDCG@10.}{13}{section*.5}%
+\contentsline {paragraph}{Response: RMSE.}{13}{section*.6}%
+\contentsline {section}{\numberline {5}Mean method ranks}{13}{section.5}%
+\contentsline {section}{\numberline {6}Calibration}{14}{section.6}%
+\contentsline {section}{\numberline {7}Selection metrics across selection intensities}{14}{section.7}%
+\contentsline {section}{\numberline {8}Minibatch size (Experiment E)}{14}{section.8}%
+\contentsline {section}{\numberline {9}Difficult splits (Experiment F)}{14}{section.9}%
+\contentsline {section}{\numberline {10}Per-dataset results}{18}{section.10}%
+\contentsline {section}{\numberline {11}Supplementary figures}{23}{section.11}%

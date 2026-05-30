@@ -1,0 +1,24 @@
+\begin{table}[ht]
+\caption{Mean rank of every model/loss method across all trait-datasets (affine-calibrated), lower is better, for predictive ability (Pearson $r$) and selection quality (NDCG@10). Ranks are computed within each (dataset, trait, scheme, calibration) block and averaged. GBLUP and ridge use no neural loss (\texttt{na}).}
+\label{tab:S-ranks}
+\begin{tabular}{lrr}
+\toprule
+Method (model/loss) & Mean rank (Pearson) & Mean rank (NDCG@10) \\
+\midrule
+ridge/na & 2.85 & 4.01 \\
+gblup/na & 3.45 & 4.32 \\
+mlp/hybrid & 5.28 & 4.80 \\
+mlp/pearson & 5.47 & 4.93 \\
+mlp/ccc & 5.62 & 5.30 \\
+mlp/mse & 6.14 & 5.56 \\
+cnn/ccc & 6.47 & 7.05 \\
+cnn/hybrid & 7.22 & 7.36 \\
+cnn/pearson & 7.93 & 7.91 \\
+transformer/ccc & 8.57 & 8.92 \\
+cnn/mse & 8.94 & 9.18 \\
+transformer/pearson & 9.67 & 8.92 \\
+transformer/hybrid & 9.88 & 9.20 \\
+transformer/mse & 12.67 & 11.78 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,57 @@
+\begin{longtable}{llp{4.6cm}p{3.4cm}r}
+\caption{Selected (frozen) hyper-parameters per dataset, from \texttt{results/hpo\_full.json}. Architecture and optimizer (learning rate, weight decay, batch size) for each neural model, plus the tuned ridge penalty $\alpha$ (shown once per dataset on the MLP row). These are reused unchanged across all losses.} \label{tab:S-hpoconfig} \\
+\toprule
+Dataset & Model & Architecture & Optimizer & Ridge $\alpha$ \\
+\midrule
+\endfirsthead
+\caption[]{Selected (frozen) hyper-parameters per dataset, from \texttt{results/hpo\_full.json}. Architecture and optimizer (learning rate, weight decay, batch size) for each neural model, plus the tuned ridge penalty $\alpha$ (shown once per dataset on the MLP row). These are reused unchanged across all losses.} \\
+\toprule
+Dataset & Model & Architecture & Optimizer & Ridge $\alpha$ \\
+\midrule
+\endhead
+\midrule
+\multicolumn{5}{r}{Continued on next page} \\
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+easygese:barley & mlp & hidden=(256, 128, 32), drop=0.5 & lr=0.001, wd=0.0001, bs=256 & 1000.0 \\
+easygese:barley & cnn & ch=(16, 32), k=21, stride=16, fc=64, drop=0.3 & lr=0.0003, wd=1e-05, bs=128 &  \\
+easygese:bean & mlp & hidden=(512, 128), drop=0.3 & lr=0.001, wd=0.001, bs=64 & 10000.0 \\
+easygese:bean & cnn & ch=(32, 64), k=11, stride=8, fc=32, drop=0.1 & lr=0.003, wd=0.001, bs=64 &  \\
+easygese:lentil & mlp & hidden=(512, 128), drop=0.1 & lr=0.003, wd=1e-05, bs=64 & 10000.0 \\
+easygese:lentil & cnn & ch=(32, 64), k=11, stride=8, fc=32, drop=0.1 & lr=0.003, wd=0.001, bs=64 &  \\
+easygese:lentil & transformer & tok=64, d=64, heads=4, layers=2, drop=0.1 & lr=0.0003, wd=1e-05, bs=64 &  \\
+easygese:maize & mlp & hidden=(256, 128, 32), drop=0.5 & lr=0.001, wd=0.0001, bs=256 & 10000.0 \\
+easygese:maize & cnn & ch=(16, 32), k=21, stride=8, fc=32, drop=0.3 & lr=0.0003, wd=1e-05, bs=64 &  \\
+easygese:maize & transformer & tok=32, d=64, heads=4, layers=1, drop=0.1 & lr=0.0003, wd=1e-05, bs=256 &  \\
+easygese:oyster & mlp & hidden=(256, 128, 32), drop=0.3 & lr=0.001, wd=0.0001, bs=256 & 10000.0 \\
+easygese:oyster & cnn & ch=(8, 16), k=21, stride=4, fc=64, drop=0.1 & lr=0.003, wd=0.0001, bs=128 &  \\
+easygese:pig & mlp & hidden=(64,), drop=0.1 & lr=0.003, wd=0.001, bs=256 & 10000.0 \\
+easygese:pig & cnn & ch=(8, 16), k=21, stride=8, fc=128, drop=0.2 & lr=0.001, wd=1e-05, bs=256 &  \\
+easygese:pine & mlp & hidden=(128, 32), drop=0.5 & lr=0.0003, wd=0.001, bs=128 & 10000.0 \\
+easygese:pine & cnn & ch=(16, 32), k=21, stride=8, fc=32, drop=0.3 & lr=0.0003, wd=1e-05, bs=64 &  \\
+easygese:rice & mlp & hidden=(512, 128), drop=0.3 & lr=0.001, wd=0.001, bs=64 & 10000.0 \\
+easygese:rice & cnn & ch=(32, 64), k=11, stride=8, fc=32, drop=0.1 & lr=0.003, wd=0.001, bs=64 &  \\
+easygese:rice & transformer & tok=32, d=64, heads=4, layers=2, drop=0.2 & lr=0.001, wd=1e-05, bs=256 &  \\
+easygese:soybean & mlp & hidden=(64,), drop=0.1 & lr=0.003, wd=0.001, bs=256 & 10000.0 \\
+easygese:soybean & cnn & ch=(16, 32), k=21, stride=16, fc=64, drop=0.3 & lr=0.0003, wd=1e-05, bs=128 &  \\
+easygese:soybean & transformer & tok=128, d=64, heads=4, layers=1, drop=0.1 & lr=0.003, wd=0.001, bs=64 &  \\
+easygese:wheatG & mlp & hidden=(256, 64), drop=0.1 & lr=0.003, wd=0.0001, bs=128 & 10000.0 \\
+easygese:wheatG & cnn & ch=(16, 32), k=21, stride=16, fc=64, drop=0.3 & lr=0.0003, wd=1e-05, bs=128 &  \\
+wheat:\_ & mlp & hidden=(512, 128), drop=0.1 & lr=0.003, wd=1e-05, bs=64 & 1000.0 \\
+wheat:\_ & cnn & ch=(16, 32), k=21, stride=16, fc=64, drop=0.3 & lr=0.0003, wd=1e-05, bs=128 &  \\
+wheat:\_ & transformer & tok=64, d=64, heads=4, layers=1, drop=0.2 & lr=0.0003, wd=1e-05, bs=64 &  \\
+soynam:yield & mlp & hidden=(128, 32), drop=0.5 & lr=0.0003, wd=0.001, bs=128 & 10000.0 \\
+soynam:yield & cnn & ch=(16, 32), k=7, stride=4, fc=32, drop=0.1 & lr=0.0003, wd=0.0001, bs=128 &  \\
+soynam:yield & transformer & tok=64, d=64, heads=4, layers=2, drop=0.2 & lr=0.0003, wd=1e-05, bs=128 &  \\
+soynam:height & mlp & hidden=(128, 32), drop=0.5 & lr=0.0003, wd=0.001, bs=128 & 1000.0 \\
+soynam:height & cnn & ch=(32, 64), k=11, stride=8, fc=32, drop=0.1 & lr=0.003, wd=0.001, bs=64 &  \\
+soynam:height & transformer & tok=64, d=64, heads=4, layers=2, drop=0.1 & lr=0.0003, wd=1e-05, bs=64 &  \\
+soynam:protein & mlp & hidden=(128, 32), drop=0.5 & lr=0.0003, wd=0.001, bs=128 & 1000.0 \\
+soynam:protein & cnn & ch=(16, 32), k=21, stride=16, fc=64, drop=0.3 & lr=0.0003, wd=1e-05, bs=128 &  \\
+soynam:protein & transformer & tok=32, d=64, heads=4, layers=2, drop=0.2 & lr=0.001, wd=1e-05, bs=256 &  \\
+soynam:oil & mlp & hidden=(128, 32), drop=0.5 & lr=0.0003, wd=0.001, bs=128 & 1000.0 \\
+soynam:oil & cnn & ch=(32, 64), k=11, stride=8, fc=32, drop=0.1 & lr=0.003, wd=0.001, bs=64 &  \\
+soynam:oil & transformer & tok=64, d=64, heads=4, layers=1, drop=0.2 & lr=0.0003, wd=1e-05, bs=64 &  \\
+\end{longtable}

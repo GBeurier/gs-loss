@@ -1,0 +1,18 @@
+\begin{table}[ht]
+\caption{Experiment E: minibatch size and the Pearson loss. Mean $\pm$ s.d. of test Pearson $r$, RMSE and NDCG@10 (affine-calibrated MLP) over four EasyGeSe datasets as a function of minibatch size (full = full-batch gradient). The minibatch estimator of the standardized-MSE loss is consistent: accuracy is stable across batch sizes.}
+\label{tab:S-batch}
+\begin{tabular}{llccc}
+\toprule
+Loss & Batch size & Pearson $r$ & RMSE & NDCG@10 \\
+\midrule
+mse & full & 0.5685 $\pm$ 0.2765 & 7.624 $\pm$ 10.750 & 0.7709 $\pm$ 0.1835 \\
+mse & 32 & 0.5685 $\pm$ 0.2676 & 7.616 $\pm$ 10.583 & 0.7730 $\pm$ 0.1740 \\
+mse & 128 & 0.5676 $\pm$ 0.2846 & 7.604 $\pm$ 10.684 & 0.7740 $\pm$ 0.1782 \\
+mse & 512 & 0.5690 $\pm$ 0.2766 & 7.626 $\pm$ 10.750 & 0.7714 $\pm$ 0.1838 \\
+pearson & full & 0.5782 $\pm$ 0.2630 & 7.560 $\pm$ 10.573 & 0.7821 $\pm$ 0.1721 \\
+pearson & 32 & 0.5774 $\pm$ 0.2615 & 7.614 $\pm$ 10.696 & 0.7752 $\pm$ 0.1798 \\
+pearson & 128 & 0.5777 $\pm$ 0.2610 & 7.616 $\pm$ 10.703 & 0.7754 $\pm$ 0.1797 \\
+pearson & 512 & 0.5790 $\pm$ 0.2635 & 7.554 $\pm$ 10.574 & 0.7820 $\pm$ 0.1720 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,13 @@
+\begin{table}[ht]
+\caption{Effect of post-hoc calibration on the Pearson-trained neural network (mlp/cnn/transformer): mean $\pm$ s.d. of each diagnostic across all folds. Affine calibration restores the regression slope towards 1 and reduces RMSE while leaving the rank correlation unchanged; isotonic calibration is monotone and similar.}
+\label{tab:S-calibration}
+\begin{tabular}{lccccc}
+\toprule
+Calibration & Pearson $r$ & RMSE & Slope & Intercept & Bias \\
+\midrule
+raw & 0.531 $\pm$ 0.229 & 8.682 $\pm$ 33.322 & 4.253 $\pm$ 20.829 & -378.780 $\pm$ 5079.496 & -0.755 $\pm$ 13.857 \\
+affine & 0.533 $\pm$ 0.227 & 7.065 $\pm$ 26.142 & 2.269 $\pm$ 66.562 & 0.104 $\pm$ 161.330 & 0.044 $\pm$ 5.005 \\
+isotonic & 0.516 $\pm$ 0.229 & 7.263 $\pm$ 26.824 & 0.764 $\pm$ 0.308 & 9.386 $\pm$ 101.289 & 0.044 $\pm$ 4.973 \\
+\bottomrule
+\end{tabular}
+\end{table}

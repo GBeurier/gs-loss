@@ -1,0 +1,119 @@
+\begin{longtable}{@{}p{2.25cm}p{1.35cm}p{1.85cm}rrcccp{2.7cm}@{}}
+\caption{Per (dataset, trait) summary. Test-set Pearson $r$ (mean over cross-validation folds) for GBLUP (raw), ridge (affine), the MSE-trained MLP (affine) and the best correlation-loss neural network (affine; winning model/loss in parentheses). $n$ is the maximum train+test sample count and $p$ the number of markers used. Sorghum is excluded (proprietary).} \label{tab:S-perdataset} \\
+\toprule
+Dataset & Trait & Species & $n$ & $p$ & GBLUP & Ridge & MLP/MSE & Best corr.\ NN \\
+\midrule
+\endfirsthead
+\caption[]{Per (dataset, trait) summary. Test-set Pearson $r$ (mean over cross-validation folds) for GBLUP (raw), ridge (affine), the MSE-trained MLP (affine) and the best correlation-loss neural network (affine; winning model/loss in parentheses). $n$ is the maximum train+test sample count and $p$ the number of markers used. Sorghum is excluded (proprietary).} \\
+\toprule
+Dataset & Trait & Species & $n$ & $p$ & GBLUP & Ridge & MLP/MSE & Best corr.\ NN \\
+\midrule
+\endhead
+\midrule
+\multicolumn{9}{r}{Continued on next page} \\
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+easygese:barley & BaMMV & barley & 1438 & 20000 & 0.649 & 0.639 & 0.660 & 0.658 (mlp/pearson) \\
+easygese:barley & BaYMV & barley & 1438 & 20000 & 0.511 & 0.471 & 0.505 & 0.509 (mlp/hybrid) \\
+easygese:bean & DF & bean & 444 & 16707 & 0.743 & 0.752 & 0.710 & 0.753 (cnn/ccc) \\
+easygese:bean & DPM & bean & 444 & 16707 & 0.666 & 0.669 & 0.638 & 0.641 (mlp/hybrid) \\
+easygese:bean & PHI & bean & 444 & 16707 & 0.421 & 0.425 & 0.389 & 0.398 (cnn/ccc) \\
+easygese:bean & X100SdW & bean & 444 & 16707 & 0.648 & 0.651 & 0.609 & 0.626 (mlp/hybrid) \\
+easygese:bean & Yd & bean & 444 & 16707 & 0.366 & 0.351 & 0.319 & 0.353 (mlp/ccc) \\
+easygese:lentil & DTF & lentil & 324 & 20000 & 0.798 & 0.796 & 0.800 & 0.804 (mlp/hybrid) \\
+easygese:lentil & DTM & lentil & 324 & 20000 & 0.828 & 0.831 & 0.828 & 0.830 (mlp/hybrid) \\
+easygese:lentil & DTS & lentil & 324 & 20000 & 0.844 & 0.845 & 0.836 & 0.847 (mlp/ccc) \\
+easygese:lentil & REP & lentil & 324 & 20000 & 0.682 & 0.682 & 0.673 & 0.693 (mlp/ccc) \\
+easygese:lentil & VEG & lentil & 324 & 20000 & 0.819 & 0.819 & 0.827 & 0.828 (mlp/ccc) \\
+easygese:maize & Ear\_\allowbreak{}Height\_\allowbreak{}cm & maize & 4420 & 20000 & 0.819 & 0.806 & 0.814 & 0.814 (mlp/hybrid) \\
+easygese:maize & Grain\_\allowbreak{}Moisture & maize & 4421 & 20000 & 0.876 & 0.874 & 0.879 & 0.879 (mlp/hybrid) \\
+easygese:maize & Plant\_\allowbreak{}Height\_\allowbreak{}cm & maize & 4420 & 20000 & 0.841 & 0.831 & 0.839 & 0.840 (mlp/pearson) \\
+easygese:maize & Pollen\_\allowbreak{}DAP\_\allowbreak{}days & maize & 4416 & 20000 & 0.926 & 0.922 & 0.925 & 0.926 (mlp/ccc) \\
+easygese:maize & Silk\_\allowbreak{}DAP\_\allowbreak{}days & maize & 4413 & 20000 & 0.926 & 0.922 & 0.922 & 0.923 (mlp/pearson) \\
+easygese:maize & Yield\_\allowbreak{}Mg\_\allowbreak{}ha & maize & 4421 & 20000 & 0.585 & 0.584 & 0.638 & 0.637 (mlp/hybrid) \\
+easygese:oyster & daydead & oyster & 214 & 20000 & 0.299 & 0.275 & 0.223 & 0.302 (cnn/ccc) \\
+easygese:oyster & mm & oyster & 372 & 20000 & 0.457 & 0.459 & 0.406 & 0.434 (cnn/ccc) \\
+easygese:pig & MS & pig & 1709 & 20000 & 0.321 & 0.285 & 0.310 & 0.315 (mlp/ccc) \\
+easygese:pig & PFAI & pig & 1709 & 20000 & 0.291 & 0.257 & 0.275 & 0.287 (mlp/ccc) \\
+easygese:pine & BA & pine & 861 & 4421 & 0.811 & 0.812 & 0.802 & 0.806 (mlp/ccc) \\
+easygese:pine & BD & pine & 861 & 4421 & 0.811 & 0.816 & 0.816 & 0.820 (mlp/pearson) \\
+easygese:pine & BLC & pine & 861 & 4421 & 0.791 & 0.789 & 0.784 & 0.790 (mlp/pearson) \\
+easygese:pine & CWAC & pine & 861 & 4421 & 0.711 & 0.714 & 0.700 & 0.705 (mlp/ccc) \\
+easygese:pine & CWAL & pine & 861 & 4421 & 0.762 & 0.769 & 0.750 & 0.760 (mlp/hybrid) \\
+easygese:pine & DBH & pine & 861 & 4421 & 0.714 & 0.718 & 0.714 & 0.719 (mlp/hybrid) \\
+easygese:pine & HT & pine & 861 & 4421 & 0.611 & 0.620 & 0.609 & 0.614 (mlp/pearson) \\
+easygese:pine & HTLC & pine & 861 & 4421 & 0.786 & 0.784 & 0.775 & 0.778 (mlp/pearson) \\
+easygese:pine & c5c6 & pine & 910 & 4421 & 0.891 & 0.906 & 0.901 & 0.907 (mlp/pearson) \\
+easygese:pine & density & pine & 910 & 4421 & 0.934 & 0.944 & 0.939 & 0.942 (mlp/pearson) \\
+easygese:pine & gall & pine & 807 & 4421 & 0.889 & 0.890 & 0.887 & 0.889 (mlp/ccc) \\
+easygese:pine & lateWood.4 & pine & 910 & 4421 & 0.894 & 0.905 & 0.901 & 0.903 (mlp/pearson) \\
+easygese:pine & lignin & pine & 910 & 4421 & 0.893 & 0.905 & 0.904 & 0.907 (mlp/pearson) \\
+easygese:pine & rootnum & pine & 925 & 4421 & 0.866 & 0.871 & 0.868 & 0.874 (mlp/hybrid) \\
+easygese:pine & rootnumbin & pine & 925 & 4421 & 0.846 & 0.856 & 0.859 & 0.863 (mlp/pearson) \\
+easygese:pine & rustbin & pine & 807 & 4421 & 0.848 & 0.854 & 0.845 & 0.849 (mlp/ccc) \\
+easygese:pine & stiffnessTree & pine & 910 & 4421 & 0.864 & 0.868 & 0.859 & 0.866 (mlp/ccc) \\
+easygese:rice & Alkali\_\allowbreak{}spreading\_\allowbreak{}value & rice & 345 & 20000 & 0.285 & 0.276 & 0.244 & 0.328 (cnn/ccc) \\
+easygese:rice & Amylose\_\allowbreak{}content & rice & 344 & 20000 & 0.658 & 0.659 & 0.640 & 0.675 (cnn/pearson) \\
+easygese:rice & Awn\_\allowbreak{}presence & rice & 338 & 20000 & 0.169 & 0.197 & 0.129 & 0.180 (cnn/pearson) \\
+easygese:rice & Blast\_\allowbreak{}resistance & rice & 342 & 20000 & 0.514 & 0.510 & 0.457 & 0.506 (cnn/ccc) \\
+easygese:rice & Brown\_\allowbreak{}rice\_\allowbreak{}length\_\allowbreak{}width\_\allowbreak{}ratio & rice & 346 & 20000 & 0.622 & 0.620 & 0.546 & 0.617 (cnn/ccc) \\
+easygese:rice & Brown\_\allowbreak{}rice\_\allowbreak{}seed\_\allowbreak{}length & rice & 346 & 20000 & 0.546 & 0.542 & 0.445 & 0.556 (cnn/ccc) \\
+easygese:rice & Brown\_\allowbreak{}rice\_\allowbreak{}seed\_\allowbreak{}width & rice & 346 & 20000 & 0.664 & 0.667 & 0.628 & 0.677 (cnn/hybrid) \\
+easygese:rice & Brown\_\allowbreak{}rice\_\allowbreak{}surface\_\allowbreak{}area & rice & 346 & 20000 & 0.507 & 0.518 & 0.451 & 0.573 (cnn/pearson) \\
+easygese:rice & Brown\_\allowbreak{}rice\_\allowbreak{}volume & rice & 346 & 20000 & 0.600 & 0.605 & 0.579 & 0.640 (cnn/hybrid) \\
+easygese:rice & Culm\_\allowbreak{}habit & rice & 351 & 20000 & 0.607 & 0.607 & 0.572 & 0.598 (cnn/hybrid) \\
+easygese:rice & FT\_\allowbreak{}ratio\_\allowbreak{}of\_\allowbreak{}Arkansas\_\allowbreak{}Aberdeen & rice & 319 & 20000 & 0.351 & 0.372 & 0.258 & 0.309 (cnn/ccc) \\
+easygese:rice & FT\_\allowbreak{}ratio\_\allowbreak{}of\_\allowbreak{}Faridpur\_\allowbreak{}Aberdeen & rice & 280 & 20000 & 0.153 & 0.261 & 0.203 & 0.238 (cnn/ccc) \\
+easygese:rice & Flag\_\allowbreak{}leaf\_\allowbreak{}length & rice & 346 & 20000 & 0.323 & 0.333 & 0.233 & 0.310 (cnn/ccc) \\
+easygese:rice & Flag\_\allowbreak{}leaf\_\allowbreak{}width & rice & 346 & 20000 & 0.640 & 0.639 & 0.608 & 0.667 (cnn/ccc) \\
+easygese:rice & Florets\_\allowbreak{}per\_\allowbreak{}panicle & rice & 346 & 20000 & 0.417 & 0.426 & 0.329 & 0.422 (cnn/pearson) \\
+easygese:rice & Flowering\_\allowbreak{}time\_\allowbreak{}at\_\allowbreak{}Aberdeen & rice & 325 & 20000 & 0.011 & 0.144 & 0.159 & 0.244 (cnn/ccc) \\
+easygese:rice & Flowering\_\allowbreak{}time\_\allowbreak{}at\_\allowbreak{}Arkansas & rice & 342 & 20000 & 0.449 & 0.449 & 0.393 & 0.485 (cnn/ccc) \\
+easygese:rice & Flowering\_\allowbreak{}time\_\allowbreak{}at\_\allowbreak{}Faridpur & rice & 281 & 20000 & 0.339 & 0.341 & 0.294 & 0.330 (mlp/hybrid) \\
+easygese:rice & Leaf\_\allowbreak{}pubescence & rice & 265 & 20000 & 0.446 & 0.451 & 0.357 & 0.426 (cnn/hybrid) \\
+easygese:rice & Panicle\_\allowbreak{}fertility & rice & 345 & 20000 & 0.345 & 0.345 & 0.290 & 0.342 (cnn/ccc) \\
+easygese:rice & Panicle\_\allowbreak{}length & rice & 344 & 20000 & 0.522 & 0.525 & 0.434 & 0.505 (cnn/pearson) \\
+easygese:rice & Panicle\_\allowbreak{}number\_\allowbreak{}per\_\allowbreak{}plant & rice & 341 & 20000 & 0.734 & 0.736 & 0.712 & 0.741 (cnn/ccc) \\
+easygese:rice & Pericarp\_\allowbreak{}color & rice & 346 & 20000 & 0.461 & 0.373 & 0.369 & 0.487 (cnn/pearson) \\
+easygese:rice & Plant\_\allowbreak{}height & rice & 352 & 20000 & 0.605 & 0.600 & 0.531 & 0.610 (cnn/ccc) \\
+easygese:rice & Primary\_\allowbreak{}panicle\_\allowbreak{}branch\_\allowbreak{}number & rice & 344 & 20000 & 0.474 & 0.474 & 0.396 & 0.496 (cnn/hybrid) \\
+easygese:rice & Protein\_\allowbreak{}content & rice & 338 & 20000 & 0.370 & 0.378 & 0.261 & 0.353 (cnn/ccc) \\
+easygese:rice & Seed\_\allowbreak{}color & rice & 346 & 20000 & 0.094 & 0.057 & 0.269 & 0.331 (mlp/hybrid) \\
+easygese:rice & Seed\_\allowbreak{}length & rice & 346 & 20000 & 0.478 & 0.478 & 0.377 & 0.450 (cnn/pearson) \\
+easygese:rice & Seed\_\allowbreak{}length\_\allowbreak{}width\_\allowbreak{}ratio & rice & 346 & 20000 & 0.603 & 0.603 & 0.549 & 0.588 (cnn/ccc) \\
+easygese:rice & Seed\_\allowbreak{}number\_\allowbreak{}per\_\allowbreak{}panicle & rice & 345 & 20000 & 0.294 & 0.329 & 0.312 & 0.336 (cnn/pearson) \\
+easygese:rice & Seed\_\allowbreak{}surface\_\allowbreak{}area & rice & 346 & 20000 & 0.494 & 0.503 & 0.408 & 0.529 (cnn/hybrid) \\
+easygese:rice & Seed\_\allowbreak{}volume & rice & 346 & 20000 & 0.585 & 0.591 & 0.536 & 0.615 (cnn/hybrid) \\
+easygese:rice & Seed\_\allowbreak{}width & rice & 346 & 20000 & 0.654 & 0.656 & 0.614 & 0.667 (transformer/ccc) \\
+easygese:rice & Straighthead\_\allowbreak{}suseptability & rice & 304 & 20000 & 0.592 & 0.595 & 0.522 & 0.560 (cnn/ccc) \\
+easygese:rice & Year06Flowering\_\allowbreak{}time\_\allowbreak{}at\_\allowbreak{}Arkansas & rice & 308 & 20000 & 0.487 & 0.489 & 0.387 & 0.491 (cnn/ccc) \\
+easygese:rice & Year07Flowering\_\allowbreak{}time\_\allowbreak{}at\_\allowbreak{}Arkansas & rice & 337 & 20000 & 0.435 & 0.431 & 0.394 & 0.461 (cnn/ccc) \\
+easygese:soybean & C13 & soybean & 346 & 20000 & 0.379 & 0.370 & 0.357 & 0.365 (mlp/ccc) \\
+easygese:soybean & Wilt & soybean & 346 & 20000 & 0.418 & 0.421 & 0.389 & 0.414 (mlp/hybrid) \\
+soynam:height & height & soybeanNAM & 5487 & 4401 & 0.680 & 0.679 & 0.677 & 0.683 (mlp/hybrid) \\
+soynam:oil & oil & soybeanNAM & 5487 & 4401 & 0.715 & 0.715 & 0.703 & 0.713 (mlp/hybrid) \\
+soynam:protein & protein & soybeanNAM & 5487 & 4401 & 0.732 & 0.733 & 0.726 & 0.727 (mlp/ccc) \\
+soynam:yield & yield & soybeanNAM & 5487 & 4401 & 0.708 & 0.700 & 0.695 & 0.696 (mlp/pearson) \\
+wheat & env1 & wheat & 599 & 1279 & 0.511 & 0.514 & 0.546 & 0.548 (mlp/hybrid) \\
+wheat & env2 & wheat & 599 & 1279 & 0.494 & 0.496 & 0.453 & 0.458 (mlp/hybrid) \\
+wheat & env3 & wheat & 599 & 1279 & 0.388 & 0.386 & 0.379 & 0.368 (mlp/hybrid) \\
+wheat & env4 & wheat & 599 & 1279 & 0.431 & 0.428 & 0.453 & 0.465 (cnn/ccc) \\
+easygese:wheatG & DTR & wheatG & 371 & 12546 & 0.441 & 0.443 & 0.397 & 0.415 (mlp/ccc) \\
+easygese:wheatG & EW & wheatG & 371 & 12546 & 0.369 & 0.374 & 0.328 & 0.337 (mlp/ccc) \\
+easygese:wheatG & FHB & wheatG & 371 & 12546 & 0.700 & 0.706 & 0.700 & 0.707 (mlp/ccc) \\
+easygese:wheatG & GH & wheatG & 371 & 12546 & 0.573 & 0.571 & 0.558 & 0.574 (mlp/hybrid) \\
+easygese:wheatG & GPE & wheatG & 371 & 12546 & 0.341 & 0.339 & 0.301 & 0.332 (mlp/hybrid) \\
+easygese:wheatG & GY & wheatG & 371 & 12546 & 0.629 & 0.627 & 0.601 & 0.608 (mlp/hybrid) \\
+easygese:wheatG & HAG & wheatG & 371 & 12546 & 0.466 & 0.466 & 0.442 & 0.454 (mlp/pearson) \\
+easygese:wheatG & HD & wheatG & 371 & 12546 & 0.672 & 0.690 & 0.700 & 0.698 (mlp/pearson) \\
+easygese:wheatG & PC & wheatG & 371 & 12546 & 0.658 & 0.667 & 0.650 & 0.665 (mlp/ccc) \\
+easygese:wheatG & PH & wheatG & 371 & 12546 & 0.795 & 0.803 & 0.805 & 0.805 (mlp/ccc) \\
+easygese:wheatG & SDS & wheatG & 371 & 12546 & 0.757 & 0.767 & 0.747 & 0.741 (mlp/hybrid) \\
+easygese:wheatG & SEP & wheatG & 371 & 12546 & 0.490 & 0.492 & 0.463 & 0.472 (mlp/pearson) \\
+easygese:wheatG & STC & wheatG & 371 & 12546 & 0.574 & 0.580 & 0.561 & 0.542 (mlp/pearson) \\
+easygese:wheatG & SW & wheatG & 371 & 12546 & 0.743 & 0.745 & 0.744 & 0.749 (mlp/ccc) \\
+easygese:wheatG & TKW & wheatG & 371 & 12546 & 0.430 & 0.442 & 0.415 & 0.432 (mlp/ccc) \\
+easygese:wheatG & ZEL & wheatG & 371 & 12546 & 0.775 & 0.778 & 0.760 & 0.760 (mlp/ccc) \\
+\end{longtable}

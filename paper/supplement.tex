@@ -1,0 +1,187 @@
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage[font=small,labelfont=bf]{caption}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+% Supplementary numbering: Tables S1.. and Figures S1..
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{table}{0}
+\setcounter{figure}{0}
+
+% figures live alongside the fragments under supp/
+\graphicspath{{supp/}}
+
+\title{\bfseries Supporting Information for:\\[4pt]
+Metric-consistent neural networks for genomic prediction and selection}
+\author{Gr\'egory Beurier, Denis Cornet, Lauriane Rouan, David Cros}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent
+This document (\textbf{File~S1}) collects the full numerical results underlying
+the manuscript. Every value is generated directly from the deposited result
+files by \texttt{analysis/make\_supplement.py}; no number is transcribed by
+hand. Throughout, ``$\Delta$'' denotes the change of a metric relative to the
+mean-squared-error (MSE) baseline for an otherwise identical neural network
+(architecture and optimizer frozen across losses), summarized over (dataset,
+trait) cells with bias-corrected and accelerated (BCa) bootstrap 95\% confidence
+intervals and Holm-corrected paired Wilcoxon signed-rank $p$-values. Unless
+stated otherwise, neural-network predictions are affine-calibrated. The
+proprietary sorghum case study is summarized in the main text and is not
+reproduced here.
+
+\tableofcontents
+
+% ---------------------------------------------------------------------------
+\section{Numerical verification of the equivalences (Experiment A)}
+Table~\ref{tab:S-expA} confirms, to machine precision, the algebraic identities
+that motivate the standardized-MSE Pearson loss: the standardized MSE equals
+$2(1-r)$ (Proposition~1), the affine-optimal MSE identity holds (Proposition~2),
+and the analytic loss gradients match automatic differentiation.
+\input{supp/tabS_expA.tex}
+
+% ---------------------------------------------------------------------------
+\section{Hyper-parameter search spaces and selected configurations}
+To keep the headline comparison fair, the architecture and optimizer are tuned
+once per (dataset, model) with a neutral MSE objective and then frozen across
+every loss. Table~\ref{tab:S-hpospaces} lists the search spaces;
+Table~\ref{tab:S-hpoconfig} lists the configuration selected for each dataset.
+\input{supp/tabS_hpospaces.tex}
+\input{supp/tabS_hpoconfig.tex}
+
+% ---------------------------------------------------------------------------
+\section{Full $\Delta$-versus-MSE tables}
+Table~\ref{tab:S-deltas-full} gives the complete $\Delta$-versus-MSE results for
+the affine-calibrated neural network across all predictive metrics (Pearson,
+Spearman, RMSE, MAE, $R^2$) and all selection metrics (overlap, NDCG, selection
+differential, relative efficiency, mean of selected) at every selection size
+$k\in\{5,10,15,20\}$, both pooled across architectures and broken down per
+architecture.
+{\small\input{supp/tabS_deltas_full.tex}}
+
+% ---------------------------------------------------------------------------
+\section{Confirmatory mixed-effects models}
+Table~\ref{tab:S-lmm} reports the linear mixed-model coefficients (lme4) for
+Pearson $r$, NDCG@10 and RMSE on the affine-calibrated grid, with the MSE loss
+and the CNN architecture as references and a random intercept per (dataset,
+trait).
+\begin{table}[ht]
+\centering
+\caption{Mixed-effects model coefficients for the affine-calibrated neural-network
+grid. Estimates, standard errors, $t$-values and 95\% confidence intervals for
+each fixed effect; the MSE loss and the CNN architecture are the reference
+levels.}
+\label{tab:S-lmm}
+\end{table}
+\input{supp/tabS_lmm.tex}
+
+% ---------------------------------------------------------------------------
+\section{Mean method ranks}
+Table~\ref{tab:S-ranks} ranks every model/loss combination across all
+trait-datasets for predictive ability and for selection quality.
+\input{supp/tabS_ranks.tex}
+
+% ---------------------------------------------------------------------------
+\section{Calibration}
+Table~\ref{tab:S-calibration} summarizes the effect of post-hoc calibration on
+the Pearson-trained network. Figure~\ref{fig:S-calibration} shows the
+fold-level raw-versus-affine relationship for the calibration slope, RMSE and
+intercept.
+\input{supp/tabS_calibration.tex}
+
+% ---------------------------------------------------------------------------
+\section{Selection metrics across selection intensities}
+Figure~\ref{fig:S-selection-k} shows how the selection benefit varies with the
+selection size $k$.
+
+% ---------------------------------------------------------------------------
+\section{Minibatch size (Experiment E)}
+Table~\ref{tab:S-batch} reports test accuracy as a function of minibatch size for
+the Pearson loss; Figure~\ref{fig:S-batch} shows the per-dataset curves. The
+minibatch estimator of the standardized-MSE loss is consistent, so accuracy is
+stable across batch sizes.
+\input{supp/tabS_batch.tex}
+
+% ---------------------------------------------------------------------------
+\section{Difficult splits (Experiment F)}
+Tables~\ref{tab:S-splits} and~\ref{tab:S-splits-arch} ask whether the loss
+benefit persists under random, within-environment, leave-family-out and
+cross-environment cross-validation, pooled and per architecture.
+\input{supp/tabS_splits.tex}
+
+% ---------------------------------------------------------------------------
+\section{Per-dataset results}
+Table~\ref{tab:S-perdataset} lists, for every (dataset, trait), the sample size,
+marker count and Pearson predictive ability of GBLUP, ridge, the MSE-trained
+MLP and the best correlation-loss neural network.
+{\small\input{supp/tabS_perdataset.tex}}
+
+% ---------------------------------------------------------------------------
+\section{Supplementary figures}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figS_arch_deltas.pdf}
+\caption{Per-architecture distributions of $\Delta$ Pearson $r$ (top) and
+$\Delta$ NDCG@10 (bottom) for the Pearson, hybrid and CCC losses relative to MSE,
+for the affine-calibrated MLP, CNN and Transformer. Violins show the
+distribution over (dataset, trait) cells; the dashed line marks no change. The
+benefit is substantial for the CNN and Transformer and small for the well-tuned
+MLP.}
+\label{fig:S-arch-deltas}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figS_selection_k.pdf}
+\caption{Pooled $\Delta$ of three selection metrics --- top-$k$ overlap, NDCG@k
+and relative efficiency@k --- at selection sizes $k\in\{5,10,15,20\}$, for the
+affine-calibrated neural network. Bars are bootstrap means with BCa 95\%
+confidence intervals; the dashed line marks no change. The selection advantage
+of correlation-consistent training is present across selection intensities.}
+\label{fig:S-selection-k}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figS_calibration.pdf}
+\caption{Affine calibration of the Pearson-trained neural network (extends main
+text Fig.~5). Each point is a cross-validation fold; raw values on the $x$-axis,
+affine-calibrated values on the $y$-axis, for the calibration slope, RMSE and
+intercept. Calibration drives the slope towards 1 and the intercept towards 0
+and reduces RMSE while leaving the rank correlation unchanged.}
+\label{fig:S-calibration}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figS_meta.pdf}
+\caption{Meta-analysis of when correlation-consistent training helps selection.
+$\Delta$ NDCG@10 of the Pearson loss versus MSE plotted against training-set size
+(left) and against GBLUP predictive ability (right), colored by species, for the
+affine-calibrated neural network.}
+\label{fig:S-meta}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.75\linewidth]{figS_batch.pdf}
+\caption{Experiment E: test Pearson $r$ (affine-calibrated MLP, Pearson loss)
+versus minibatch size for each of four EasyGeSe datasets (``full'' = full-batch
+gradient). Accuracy is insensitive to the minibatch size.}
+\label{fig:S-batch}
+\end{figure}
+
+\end{document}

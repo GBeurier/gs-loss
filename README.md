@@ -83,8 +83,11 @@ tests/       unit tests
 | Submission (single-column, figures inline) | `paper/main.pdf` | `cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main` |
 | bioRxiv preprint (line-numbered) | `paper/main_preprint.pdf` | `pdflatex --jobname=main_preprint "\def\PREPRINTMODE{1}\input{main}"` (+ bibtex, ×2) |
 | Official GSA **G3** template (two-column) | `paper/g3/main_g3.pdf` | `cd paper/g3 && pdflatex main_g3 && bibtex main_g3 && pdflatex main_g3 && pdflatex main_g3` |
+| Supporting Information (File S1) | `paper/supplement.pdf` | `python analysis/make_supplement.py && cd paper && pdflatex supplement && pdflatex supplement` |
 
-The cover letter is `paper/cover_letter.md`. G3 accepts any format for initial
+`paper/supplement.pdf` (Tables S1–S11, Figures S1–S5) is generated entirely from
+the deposited result files by `analysis/make_supplement.py`. The cover letter is
+`paper/cover_letter.md`. G3 accepts any format for initial
 submission; the `paper/g3/` build follows the official `gsag3jnl` template
 (`articletype{gs}`, Genomic Selection).
 

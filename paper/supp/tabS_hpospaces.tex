@@ -1,0 +1,45 @@
+\begin{longtable}{llp{7cm}}
+\caption{Hyper-parameter search spaces. Architecture and optimizer settings are tuned once per (dataset, model) with a neutral MSE objective, selected by validation Pearson, then frozen and reused across every loss so that only the loss changes in the headline comparison. Classical models tune their regularization analogously; GBLUP is tuning-free. Reproduced from \texttt{ccgp/hpo.py}.} \label{tab:S-hpospaces} \\
+\toprule
+Component & Hyper-parameter & Search values \\
+\midrule
+\endfirsthead
+\caption[]{Hyper-parameter search spaces. Architecture and optimizer settings are tuned once per (dataset, model) with a neutral MSE objective, selected by validation Pearson, then frozen and reused across every loss so that only the loss changes in the headline comparison. Classical models tune their regularization analogously; GBLUP is tuning-free. Reproduced from \texttt{ccgp/hpo.py}.} \\
+\toprule
+Component & Hyper-parameter & Search values \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r}{Continued on next page} \\
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+NN: mlp & hidden\_dims & (64,), (128, 32), (256, 64), (256, 128, 32), (512, 128) \\
+NN: mlp & dropout & 0.1, 0.2, 0.3, 0.5 \\
+NN: cnn & channels & (8, 16), (16, 32), (32, 64) \\
+NN: cnn & kernel\_size & 7, 11, 21 \\
+NN: cnn & first\_stride & 4, 8, 16 \\
+NN: cnn & fc\_dim & 32, 64, 128 \\
+NN: cnn & dropout & 0.1, 0.2, 0.3 \\
+NN: transformer & n\_tokens & 32, 64, 128 \\
+NN: transformer & d\_model & 32, 64 \\
+NN: transformer & n\_heads & 2, 4 \\
+NN: transformer & n\_layers & 1, 2 \\
+NN: transformer & dropout & 0.1, 0.2 \\
+NN: common (optimizer) & lr & 0.003, 0.001, 0.0003 \\
+NN: common (optimizer) & weight\_decay & 0.001, 0.0001, 1e-05 \\
+NN: common (optimizer) & batch\_size & 64, 128, 256 \\
+Classical: gblup & -- & no tuning \\
+Classical: ridge & alpha & 1.0, 10.0, 100.0, 1000.0, 10000.0 \\
+Classical: elasticnet & alpha & 0.001, 0.01, 0.1, 1.0 \\
+Classical: elasticnet & l1\_ratio & 0.1, 0.5, 0.9 \\
+Classical: rf & n\_estimators & 300 \\
+Classical: rf & max\_depth & None, 8, 16 \\
+Classical: rf & max\_features & sqrt, 0.1 \\
+Classical: xgboost & max\_depth & 3, 4, 6 \\
+Classical: xgboost & learning\_rate & 0.03, 0.05, 0.1 \\
+Classical: xgboost & n\_estimators & 300, 500 \\
+Classical: xgboost & subsample & 0.7, 0.9 \\
+Classical: xgboost & colsample\_bytree & 0.3, 0.5 \\
+\end{longtable}
