@@ -33,6 +33,29 @@ def pearson(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     return float(np.corrcoef(y_true, y_pred)[0, 1])
 
 
+def _normalized_weight(weight: np.ndarray, n: int) -> np.ndarray:
+    w = np.asarray(weight, float).reshape(-1)
+    if len(w) != n:
+        raise ValueError("weight must have one value per observation")
+    if not np.isfinite(w).all() or np.any(w < 0) or w.sum() <= 0:
+        raise ValueError("weight must be finite, non-negative, and have a positive sum")
+    return w / w.sum()
+
+
+def weighted_pearson(y_true: np.ndarray, y_pred: np.ndarray,
+                     weight: np.ndarray) -> float:
+    """Precision-weighted Pearson correlation, as used by SelGenPalm."""
+    y_true = np.asarray(y_true, float).reshape(-1)
+    y_pred = np.asarray(y_pred, float).reshape(-1)
+    w = _normalized_weight(weight, len(y_true))
+    yt = y_true - np.sum(w * y_true)
+    yp = y_pred - np.sum(w * y_pred)
+    vt, vp = np.sum(w * yt * yt), np.sum(w * yp * yp)
+    if vt < 1e-12 or vp < 1e-12:
+        return np.nan
+    return float(np.sum(w * yt * yp) / np.sqrt(vt * vp))
+
+
 def spearman(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     if np.std(y_pred) < 1e-12:
         return np.nan
@@ -41,6 +64,26 @@ def spearman(y_true: np.ndarray, y_pred: np.ndarray) -> float:
 
 def rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     return float(np.sqrt(np.mean((np.asarray(y_true) - np.asarray(y_pred)) ** 2)))
+
+
+def nrmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """RMSE normalized by the population SD of the observed trait."""
+    scale = float(np.std(np.asarray(y_true, float)))
+    return np.nan if scale < 1e-12 else rmse(y_true, y_pred) / scale
+
+
+def weighted_rmse(y_true: np.ndarray, y_pred: np.ndarray, weight: np.ndarray) -> float:
+    y_true = np.asarray(y_true, float).reshape(-1)
+    y_pred = np.asarray(y_pred, float).reshape(-1)
+    w = _normalized_weight(weight, len(y_true))
+    return float(np.sqrt(np.sum(w * (y_true - y_pred) ** 2)))
+
+
+def weighted_nrmse(y_true: np.ndarray, y_pred: np.ndarray, weight: np.ndarray) -> float:
+    y_true = np.asarray(y_true, float).reshape(-1)
+    w = _normalized_weight(weight, len(y_true))
+    scale = float(np.sqrt(np.sum(w * (y_true - np.sum(w * y_true)) ** 2)))
+    return np.nan if scale < 1e-12 else weighted_rmse(y_true, y_pred, w) / scale
 
 
 def mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
@@ -87,6 +130,28 @@ def predictive_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict[str, floa
         "bias": bias(y_true, y_pred),
         "slope": slope,
         "intercept": intercept,
+    }
+
+
+def weighted_predictive_metrics(y_true: np.ndarray, y_pred: np.ndarray,
+                                weight: np.ndarray) -> dict[str, float]:
+    """Weighted endpoint table for heterogeneous-precision cross means."""
+    y_true = np.asarray(y_true, float).reshape(-1)
+    y_pred = np.asarray(y_pred, float).reshape(-1)
+    w = _normalized_weight(weight, len(y_true))
+    mt, mp = np.sum(w * y_true), np.sum(w * y_pred)
+    vp = np.sum(w * (y_pred - mp) ** 2)
+    cov = np.sum(w * (y_pred - mp) * (y_true - mt))
+    slope = np.nan if vp < 1e-12 else cov / vp
+    intercept = np.nan if not np.isfinite(slope) else mt - slope * mp
+    return {
+        "weighted_pearson": weighted_pearson(y_true, y_pred, w),
+        "weighted_rmse": weighted_rmse(y_true, y_pred, w),
+        "weighted_nrmse": weighted_nrmse(y_true, y_pred, w),
+        "weighted_mae": float(np.sum(w * np.abs(y_true - y_pred))),
+        "weighted_bias": float(np.sum(w * (y_pred - y_true))),
+        "weighted_slope": float(slope),
+        "weighted_intercept": float(intercept),
     }
 
 

@@ -6,7 +6,7 @@
   },
   "proposition2": {
     "max_abs_diff": 1.1934897514720433e-15,
-    "mean_abs_diff": 1.7975421498506173e-16,
+    "mean_abs_diff": 1.8177299943022973e-16,
     "n_cases": 200
   },
   "gradient": {

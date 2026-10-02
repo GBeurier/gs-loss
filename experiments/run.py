@@ -22,10 +22,17 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from dataclasses import asdict
 from pathlib import Path
 
+import sys
+
+# Make the package importable no matter how this script is launched (python
+# experiments/run.py, nohup, nice, mp-spawn workers) without relying on
+# PYTHONPATH: put the repo root on sys.path before importing ccgp.
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 import numpy as np
 import pandas as pd
 
-from ccgp.config import CLASSICAL, FULL, SMOKE, GridConfig
+from ccgp.config import CAMPAIGN, CLASSICAL, FULL, SMOKE, GridConfig
 from ccgp.data import CACHE, load_easygese, load_soynam, load_wheat
 from ccgp.experiment import run_cell, run_cross_env
 from ccgp.hpo import tune_dataset
@@ -71,7 +78,13 @@ def models_for(key: str, cfg: GridConfig) -> list[str]:
     species = name if src == "easygese" else src
     if species in cfg.transformer_species:
         archs = archs + ["transformer"]
-    return list(cfg.classical_models) + archs
+    out = list(cfg.classical_models) + archs
+    seen, deduped = set(), []                      # CAMPAIGN puts transformer in nn_archs AND
+    for m in out:                                  # in transformer_species -> drop the duplicate
+        if m not in seen:
+            seen.add(m)
+            deduped.append(m)
+    return deduped
 
 
 def traits_for(ds, cfg: GridConfig) -> list[str]:
@@ -122,32 +135,110 @@ def run_job(args):
 
 # --- parallel execution ------------------------------------------------------
 
-def _gpu_init(q):
+def _omp_threads(n_workers):
+    return max(1, (os.cpu_count() or 1) // max(1, n_workers))
+
+
+def _gpu_init(q, omp_threads):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(q.get())
-    os.environ["OMP_NUM_THREADS"] = "4"
+    os.environ["OMP_NUM_THREADS"] = str(omp_threads)
+
+
+def _shard_path(cfg, key, trait):
+    safe = f"{key}__{trait}".replace(":", "_").replace("/", "_").replace(" ", "_").replace("*", "x")
+    return RESULTS / f"main_{cfg.name}_shards" / f"{safe}.parquet"
+
+
+def validate_main_shards(cfg: GridConfig, jobs):
+    """Read and validate every expected main-campaign shard before assembly.
+
+    A partially written Parquet file can otherwise look like a completed cell,
+    and concatenating whatever happens to be present produces a deceptively
+    plausible partial result table.  Assembly is therefore intentionally
+    all-or-nothing: every expected (dataset, trait) shard must be readable,
+    contain the full 900 rows of the campaign grid, and have unique result
+    keys.  This is a reproducibility guard, not an analysis filter.
+    """
+    frames = []
+    failures = []
+    key_columns = ["dataset", "trait", "model", "loss", "scheme", "repeat",
+                   "fold", "calibration", "seed"]
+    for key, trait in jobs:
+        path = _shard_path(cfg, key, trait)
+        if not path.exists():
+            failures.append(f"missing {path}")
+            continue
+        try:
+            frame = pd.read_parquet(path)
+        except Exception as exc:
+            failures.append(f"unreadable {path}: {type(exc).__name__}: {exc}")
+            continue
+        if len(frame) != 900:
+            failures.append(f"wrong row count {path}: {len(frame)} (expected 900)")
+            continue
+        missing_columns = sorted(set(key_columns) - set(frame.columns))
+        if missing_columns:
+            failures.append(f"missing columns {path}: {missing_columns}")
+            continue
+        if frame.duplicated(key_columns).any():
+            failures.append(f"duplicate experimental key in {path}")
+            continue
+        frames.append(frame)
+    if failures:
+        preview = "\n  ".join(failures[:10])
+        raise SystemExit(
+            f"cannot assemble campaign: {len(failures)} shard integrity failure(s)\n  {preview}")
+    result = pd.concat(frames, ignore_index=True)
+    if len(result) != 900 * len(jobs):
+        raise SystemExit(
+            f"cannot assemble campaign: {len(result)} rows (expected {900 * len(jobs)})")
+    if result.duplicated(key_columns).any():
+        raise SystemExit("cannot assemble campaign: duplicate experimental key across shards")
+    return result
+
+
+def _run_job_sharded(args):
+    """Run one (dataset,trait) cell and persist it as a shard immediately, so a
+    kill/crash never loses completed cells. Skips cells whose shard already exists."""
+    key, trait, cfg_dict, hpo = args
+    cfg = GridConfig(**cfg_dict)
+    sp = _shard_path(cfg, key, trait)
+    if sp.exists():
+        return key, trait, "skip"
+    df = run_job(args)
+    sp.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(sp)
+    return key, trait, "done"
 
 
 def execute(jobs, cfg, hpo, gpus, streams, serial=False):
-    payloads = [(k, t, asdict(cfg), hpo) for (k, t) in jobs]
-    shards = []
+    # Resume: drop cells whose shard already exists.
+    todo = [(k, t) for (k, t) in jobs if not _shard_path(cfg, k, t).exists()]
+    skipped = len(jobs) - len(todo)
+    if skipped:
+        print(f"[run] resuming: {skipped} cells already done (shards), {len(todo)} to do", flush=True)
+    payloads = [(k, t, asdict(cfg), hpo) for (k, t) in todo]
+
     if serial:
         for i, pl in enumerate(payloads):
-            shards.append(run_job(pl))
-            print(f"[run] {i+1}/{len(payloads)} {pl[0]}:{pl[1]} done", flush=True)
-        return pd.concat(shards, ignore_index=True)
+            _, _, st = _run_job_sharded(pl)
+            print(f"[run] {i+1}/{len(payloads)} {pl[0]}:{pl[1]} {st}", flush=True)
+    else:
+        n_workers = len(gpus) * streams
+        ctx = mp.get_context("spawn")
+        q = ctx.Queue()
+        for i in range(n_workers):
+            q.put(gpus[i % len(gpus)])
+        with ProcessPoolExecutor(n_workers, mp_context=ctx, initializer=_gpu_init,
+                                 initargs=(q, _omp_threads(n_workers))) as ex:
+            futs = {ex.submit(_run_job_sharded, pl): (pl[0], pl[1]) for pl in payloads}
+            for i, fut in enumerate(as_completed(futs)):
+                k, t, st = fut.result()
+                print(f"[run] {i+1}/{len(futs)} {k}:{t} {st}", flush=True)
 
-    n_workers = len(gpus) * streams
-    ctx = mp.get_context("spawn")
-    q = ctx.Queue()
-    for i in range(n_workers):
-        q.put(gpus[i % len(gpus)])
-    with ProcessPoolExecutor(n_workers, mp_context=ctx, initializer=_gpu_init, initargs=(q,)) as ex:
-        futs = {ex.submit(run_job, pl): (pl[0], pl[1]) for pl in payloads}
-        for i, fut in enumerate(as_completed(futs)):
-            k, t = futs[fut]
-            shards.append(fut.result())
-            print(f"[run] {i+1}/{len(futs)} {k}:{t} done", flush=True)
-    return pd.concat(shards, ignore_index=True)
+    # Assemble the full table from all shards (this run's + any prior).
+    shard_files = sorted(_shard_path(cfg, "*", "*").parent.glob("*.parquet"))
+    return pd.concat([pd.read_parquet(s) for s in shard_files], ignore_index=True)
 
 
 # --- HPO ---------------------------------------------------------------------
@@ -163,6 +254,58 @@ def run_hpo(cfg, path):
         cache[key] = tune_dataset(ds, models_for(key, cfg), cfg.hpo_trials, cfg.hpo_folds, cfg.seed)
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(cache, indent=1))
+    return cache
+
+
+def _hpo_one(payload):
+    """Tune ONE (dataset, arch) on the representative trait. Returns (key, arch, params)."""
+    from ccgp.hpo import tune_model, _representative_trait
+    cfg = GridConfig(**payload["cfg"])
+    key, arch = payload["key"], payload["arch"]
+    ds = make_dataset(key, cfg)
+    trait = payload["trait"] or _representative_trait(ds)
+    X, y, _, _ = ds.get_xy(trait)
+    params = tune_model(X, y, arch, cfg.hpo_trials, cfg.hpo_folds, cfg.seed)
+    return key, trait, arch, params
+
+
+def run_hpo_parallel(cfg, path, gpus, streams, serial=False):
+    """Parallel HPO across (dataset, arch) jobs -- each is independent. Writes the
+    JSON incrementally as jobs complete, so a crash resumes from the last arch
+    (not the last dataset). Falls back to the serial ``run_hpo`` when serial=True."""
+    if serial:
+        return run_hpo(cfg, path)
+    from ccgp.hpo import _representative_trait
+    path = Path(path)
+    cache = json.loads(path.read_text()) if path.exists() else {}
+    jobs = []
+    for key in unique_keys(cfg):
+        entry = cache.setdefault(key, {"trait": None, "params": {}})
+        ds = make_dataset(key, cfg)
+        if entry.get("trait") is None:
+            entry["trait"] = _representative_trait(ds)
+        for arch in models_for(key, cfg):
+            if arch in entry["params"]:
+                continue                              # resume: skip already-tuned
+            jobs.append({"key": key, "arch": arch, "trait": entry["trait"], "cfg": asdict(cfg)})
+    if not jobs:
+        return cache
+    print(f"[hpo] {len(jobs)} (dataset,arch) tuning jobs across {len(gpus)*streams} workers", flush=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    n_workers = len(gpus) * streams
+    ctx = mp.get_context("spawn")
+    q = ctx.Queue()
+    for i in range(n_workers):
+        q.put(gpus[i % len(gpus)])
+    with ProcessPoolExecutor(n_workers, mp_context=ctx, initializer=_gpu_init,
+                             initargs=(q, _omp_threads(n_workers))) as ex:
+        futs = {ex.submit(_hpo_one, pl): pl for pl in jobs}
+        for i, fut in enumerate(as_completed(futs)):
+            key, trait, arch, params = fut.result()
+            cache[key]["trait"] = trait
+            cache[key]["params"][arch] = params
+            path.write_text(json.dumps(cache, indent=1))   # incremental checkpoint
+            print(f"[hpo] {i+1}/{len(jobs)} {key}:{arch} done", flush=True)
     return cache
 
 
@@ -280,7 +423,8 @@ def run_splits(cfg, hpo, gpus, streams, serial=False, hpo_path=None):
         q = ctx.Queue()
         for i in range(n_workers):
             q.put(gpus[i % len(gpus)])
-        with ProcessPoolExecutor(n_workers, mp_context=ctx, initializer=_gpu_init, initargs=(q,)) as ex:
+        with ProcessPoolExecutor(n_workers, mp_context=ctx, initializer=_gpu_init,
+                                 initargs=(q, _omp_threads(n_workers))) as ex:
             futs = {ex.submit(run_split_payload, pl): pl for pl in payloads}
             for i, fut in enumerate(as_completed(futs)):
                 shards.append(fut.result())
@@ -293,18 +437,50 @@ def run_splits(cfg, hpo, gpus, streams, serial=False, hpo_path=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cmd", choices=["hpo", "main", "batch", "splits", "all"])
-    ap.add_argument("--preset", default="full", choices=["full", "smoke"])
+    ap.add_argument("--preset", default="full", choices=["full", "smoke", "campaign"])
     ap.add_argument("--gpus", default="0,1")
     ap.add_argument("--streams", type=int, default=2)
     ap.add_argument("--serial", action="store_true")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--cell-index", type=int, default=None,
+                    help="Run ONLY the i-th (dataset,trait) cell and write its shard, then exit. "
+                         "For SLURM array jobs (one cell per task). HPO must be pre-cached.")
+    ap.add_argument("--assemble", action="store_true",
+                    help="Merge all main shards into results_main_<preset>.parquet and exit.")
     args = ap.parse_args()
 
-    cfg = SMOKE if args.preset == "smoke" else FULL
+    cfg = {"smoke": SMOKE, "full": FULL, "campaign": CAMPAIGN}[args.preset]
     gpus = [int(g) for g in args.gpus.split(",") if g != ""]
     RESULTS.mkdir(exist_ok=True)
 
-    hpo = run_hpo(cfg, RESULTS / f"hpo_{cfg.name}.json")
+    # --- SLURM array mode: one cell per task -------------------------------
+    if args.cell_index is not None or args.assemble:
+        import json as _json
+        hpo_path = RESULTS / f"hpo_{cfg.name}.json"
+        if not hpo_path.exists():
+            raise SystemExit(f"HPO cache {hpo_path} missing; ship it to the cluster first.")
+        hpo = _json.loads(hpo_path.read_text())
+        jobs = [(k, t) for k in unique_keys(cfg) for t in traits_for(make_dataset(k, cfg), cfg)]
+        if args.assemble:
+            df = validate_main_shards(cfg, jobs)
+            out = args.out or RESULTS / f"results_main_{cfg.name}.parquet"
+            df.to_parquet(out)
+            print(f"[assemble] {len(jobs)}/{len(jobs)} cells -> {out} ({len(df)} rows)")
+            return
+        k, t = jobs[args.cell_index]
+        sp = _shard_path(cfg, k, t)
+        if sp.exists():
+            print(f"[cell {args.cell_index}] {k}:{t} already done (shard exists), skip", flush=True)
+            return
+        os.environ.setdefault("CUDA_VISIBLE_DEVICES", str(gpus[0]) if gpus else "0")
+        df = run_job((k, t, asdict(cfg), hpo))
+        sp.parent.mkdir(parents=True, exist_ok=True)
+        df.to_parquet(sp)
+        print(f"[cell {args.cell_index}] {k}:{t} done -> {sp} ({len(df)} rows)", flush=True)
+        return
+
+    hpo = run_hpo_parallel(cfg, RESULTS / f"hpo_{cfg.name}.json", gpus, args.streams,
+                           serial=args.serial)
     if args.cmd == "hpo":
         return
 

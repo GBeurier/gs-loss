@@ -29,12 +29,16 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0"]
+selgenpalm = ["h5py>=3.10"]
 
 [project.scripts]
 ccgp = "ccgp.cli:main"
 
 [tool.setuptools]
-packages = ["ccgp", "ccgp.models"]
+packages = ["ccgp", "ccgp.models", "experiments"]
 
 [tool.ruff]
 line-length = 110
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

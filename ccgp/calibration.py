@@ -36,19 +36,61 @@ class AffineCalibrator:
         self.a_ = 1.0
         self.b_ = 0.0
 
-    def fit(self, p: np.ndarray, y: np.ndarray) -> "AffineCalibrator":
+    def fit(self, p: np.ndarray, y: np.ndarray,
+            sample_weight: np.ndarray | None = None) -> "AffineCalibrator":
         p = np.asarray(p, float)
         y = np.asarray(y, float)
-        vp = np.var(p)
-        if vp < 1e-12:
-            self.a_, self.b_ = 0.0, float(y.mean())
+        if sample_weight is None:
+            mp, my = p.mean(), y.mean()
+            vp = np.mean((p - mp) ** 2)
+            cov = np.mean((p - mp) * (y - my))
         else:
-            self.a_ = float(np.cov(p, y, bias=True)[0, 1] / vp)
-            self.b_ = float(y.mean() - self.a_ * p.mean())
+            w = np.asarray(sample_weight, float).reshape(-1)
+            if len(w) != len(y) or not np.isfinite(w).all() or np.any(w < 0) or w.sum() <= 0:
+                raise ValueError("sample_weight must be finite, non-negative, and aligned")
+            w = w / w.sum()
+            mp, my = np.sum(w * p), np.sum(w * y)
+            vp = np.sum(w * (p - mp) ** 2)
+            cov = np.sum(w * (p - mp) * (y - my))
+        if vp < 1e-12:
+            self.a_, self.b_ = 0.0, float(my)
+        else:
+            self.a_ = float(cov / vp)
+            self.b_ = float(my - self.a_ * mp)
         return self
 
     def transform(self, p: np.ndarray) -> np.ndarray:
         return self.a_ * np.asarray(p, float) + self.b_
+
+
+class PositiveAffineCalibrator(AffineCalibrator):
+    """Weighted-capable affine fit constrained to a non-decreasing map.
+
+    The unconstrained validation slope occasionally becomes negative and flips
+    every test-set rank. Clipping it at a tiny positive value implements the
+    constrained least-squares boundary while preserving prediction order.
+    """
+    name = "affine_positive"
+
+    def __init__(self, min_slope: float = 1e-8) -> None:
+        super().__init__()
+        self.min_slope = min_slope
+
+    def fit(self, p: np.ndarray, y: np.ndarray,
+            sample_weight: np.ndarray | None = None) -> "PositiveAffineCalibrator":
+        super().fit(p, y, sample_weight=sample_weight)
+        if self.a_ < self.min_slope:
+            p = np.asarray(p, float)
+            y = np.asarray(y, float)
+            if sample_weight is None:
+                mp, my = p.mean(), y.mean()
+            else:
+                w = np.asarray(sample_weight, float)
+                w = w / w.sum()
+                mp, my = np.sum(w * p), np.sum(w * y)
+            self.a_ = float(self.min_slope)
+            self.b_ = float(my - self.a_ * mp)
+        return self
 
 
 class IsotonicCalibrator:
@@ -77,6 +119,7 @@ class IsotonicCalibrator:
 _CALIBRATORS = {
     "raw": RawCalibrator,
     "affine": AffineCalibrator,
+    "affine_positive": PositiveAffineCalibrator,
     "isotonic": IsotonicCalibrator,
 }
 

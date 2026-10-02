@@ -19,29 +19,28 @@ mismatch explicit and resolvable, and contributes:
    directly refutes the common assertion that correlation "cannot be used as a
    loss function," and yields a stable, differentiable training objective.
 2. **Affine calibration with a closed form.** Because correlation is
-   scale-invariant, we prove that a single post-hoc affine map restores
-   calibrated predictions with residual error $\sigma_y^2(1-r^2)$ while leaving
-   the correlation and all rankings unchanged.
-3. **Selection-aware evaluation** (top-$k$ overlap, NDCG@$k$, selection
-   differential, relative efficiency) alongside the usual metrics, across
-   101 trait–dataset combinations from 12 panels/sources spanning 10 species, with architectures, splits and
-   tuning budgets held fixed so that only the loss changes.
+   scale-invariant, we prove the optimal affine residual identity and audit the
+   practical case where a validation-fitted negative slope can reverse ranking.
+3. **A balanced public benchmark** across seven networks, 101 trait–dataset
+   tasks and 12 panels, with panel-clustered inference, normalized error,
+   upper-tail ranking metrics and a separate loss-specific nested-HPO
+   sensitivity analysis.
 
-Our central finding is deliberately nuanced. Holding architecture, splits and
-tuning fixed so that only the loss changes, correlation-consistent and CCC losses
-improve predictive ability (Δr ≈ +0.04, Holm-corrected paired Wilcoxon p<10⁻⁷) and
-selection-aware metrics (NDCG@10, relative efficiency) over MSE; but the benefit is
-strongly architecture-dependent (large for the Transformer and CNN, negligible for
-the MLP), only the concordance loss reliably improves calibrated RMSE, and no neural
-loss unseats GBLUP or ridge on mean rank. We therefore provide a principled,
-reproducible framework — and an honest map of when it helps — rather than a claim
-that one loss universally wins.
+Our central finding is deliberately nuanced. In the panel-balanced
+shared-configuration ablation, Pearson training improves raw test correlation by
+only +0.0048 (95% panel-cluster bootstrap interval 0.0008–0.0091), while NDCG@10
+and normalized-error changes are smaller. The Transformer has the clearest
+positive estimate, DeepGS is a negative counterexample, and the omnibus
+loss-by-architecture interaction is inconclusive. Nested tuning on CIMMYT wheat
+supports a Transformer signal but also exposes initialization variability. No
+neural loss unseats GBLUP or ridge on mean rank. We therefore provide an honest
+quantification of a plausible intervention rather than a universal-win claim.
 
 This work fits *G3*'s scope for computational tools and statistical methodology
 for genomic prediction. All benchmark datasets are public (EasyGeSe; the CIMMYT
 wheat panel; the SoyNAM population), and we release the complete software (`ccgp`),
-the raw and aggregated results, the exact cross-validation partitions, tuned
-configurations and a pinned environment at <https://github.com/GBeurier/gs-loss>,
+the raw and aggregated results, cross-validation definitions, tuned
+configurations and figure source data at <https://github.com/GBeurier/gs-loss>,
 so that every reported number is reproducible; a versioned archive will be deposited
 at Zenodo (reserved DOI to be inserted at submission). Per *G3*'s initial-submission
 policy any format is accepted; a manuscript prepared in the official GSA G3 template

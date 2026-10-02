@@ -1,0 +1,72 @@
+{
+  "python": "3.13.13 | packaged by conda-forge | (main, Apr  8 2026, 02:00:33) [GCC 14.3.0]",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.35",
+  "git_commit": "6ac8ac2064c21d88ba1cdfe489e3c4a1f4186eef",
+  "git_dirty": true,
+  "packages": {
+    "numpy": "2.3.5",
+    "pandas": "2.3.3",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.8.0",
+    "statsmodels": "0.14.6",
+    "torch": "2.10.0+cu128",
+    "matplotlib": "3.10.8"
+  },
+  "cuda": {
+    "available": true,
+    "torch_cuda": "12.8",
+    "devices": [
+      "NVIDIA GeForce RTX 4090",
+      "NVIDIA GeForce RTX 5090"
+    ]
+  },
+  "sha256": {
+    "results/results_main_campaign.parquet": "61e61fbc924fe42191cb1499c2bc0e789b73dfcea66542b14a7ce06ba773685f",
+    "results/results_loss_specific_wheat.parquet": "867dbe678cfef19be65bf5634a08d34fd8157731123ab9b26f20f5d85c6a60bd",
+    "results/hpo_campaign.json": "51a820fe5a99e9bac5e45d88b30ace48e1b57608a9f6b13d2bff66a0055ab8a5",
+    "results/hpo_loss_specific_wheat.json": "eed9dca00b4fa96607a68839fa95f5315fdf1a6d976bbc11fccec8dd7cd8cf51",
+    "results/analysis_final/paired_summary.csv": "13a905853316629dcd1ba87d05536888aefb46f35a966cd3cadf53bb2aca06f1",
+    "results/analysis_final/mixed_model_interaction_tests.csv": "71c668d780c8f59fa2eaff6e2ae2f921e2b357f932f80201be9080602916fe36",
+    "paper/main.pdf": "173a173893332c416a5974d6b4832932d0939df00f03ac0103468fc219cc9112",
+    "paper/supplement.pdf": "26d91da3784bad79ff5d79003cb371d9721300920c3bb32a9b3b0b6e25117f8f",
+    "paper/g3/main_g3.pdf": "a4b44453f153291b8a5476c55109f71120d9956195740cc3ea8206730b3cc792",
+    "results/analysis_final/calibration_audit.csv": "869b4e33368649503f78b58ac08e6c05b260ba407cd583db92af77ab66ae4e90",
+    "results/analysis_final/fold_outcome_sd.csv": "9a2de5906dc16610359f7e55954f1a0e39d8dbd4240ec09cecbe772301bcc53f",
+    "results/analysis_final/method_ranks.csv": "4e1590192950b1d9c1dec7cff370c1c66e67c4ac35771b62d5c4ca050ba23e41",
+    "results/analysis_final/mixed_model_coefficients.csv": "58ba41459e63842ad7421512eed81a88b879fd00a0509be18ef19bb2972887db",
+    "results/analysis_final/nested_hpo_seed_deltas.csv": "6a5fe2bc6942e501e644b85cd4699a2f17fd2b093fe18a86d6378b673a92a9dc",
+    "results/analysis_final/nested_hpo_seed_variability.csv": "9fbe6a03d9d3f67a6ab19c8a60a7d9afc3554e9ade13ac87ca395f3bf7dd0cd7",
+    "results/analysis_final/nested_hpo_summary.csv": "c649e4e45e7e1397887ff8c87ea23a69158d62f2621b376fd2c640dd5880e1f4",
+    "results/analysis_final/paired_deltas.csv": "a54bf3141277e1a80977af80b85920cc18105922082ed48043f30a84195dd5d7",
+    "figures/source_data/fig1_geometry_points.csv": "633be8a1b06e944c3d4e6d305e9bca49c82b224533220cd7ca6cbe84e497d175",
+    "figures/source_data/fig2_simulation_points.csv": "8a522ac65626aa0f294b37b7422d0b3483297706544bdb82cad79b2151450328",
+    "figures/source_data/fig3_datasets.csv": "52e8afbccda51345533ad499541f76e9621b01f63bb6ffad4a3ea6f7c1bd5eba",
+    "figures/source_data/fig4_architecture_effects.csv": "2a41cf7ea08b19df9a4276eea35a8afafb56e08d4dff605b51833f82a1a1d95b",
+    "figures/source_data/fig4_headline_panel_values.csv": "66ecd1bfe5c343dd71cae01595abdf8fd9fc3518e2b284b68adc214149bfb104",
+    "figures/source_data/fig4_headline_strategy_summary.csv": "dca545f7d79bc69e80455c716906965d2881be40e6e184c3e0c918e8d3358799",
+    "figures/source_data/fig4_loss_comparison.csv": "74de8db4f965ee92ca42025a1eb670b933e7ddee89730300b90ac244c5e69e00",
+    "figures/source_data/fig5_calibration_fold_changes.csv": "6304d76c8f4626a4917661a9b5304cf0268941774f690a1c3d7227ac07c27f28",
+    "figures/source_data/fig5_calibration_task_model.csv": "768ec3ea863f3da3da12636df868071ac269757277fed8adc72af330ec29f8cc",
+    "figures/source_data/fig6_nested_hpo_seed_deltas.csv": "c591fc7d5614fb24154623887cff76182b9322dd5ecd95633418f76b5db96aa9",
+    "figures/source_data/fig6_nested_hpo_summary.csv": "aa5ef51e1f6aee8e44b954ba015f81ae17c7491775df5b3587647d01173e2a72",
+    "figures/source_data/fig6_shared_hpo_all_models.csv": "c439085b03cb8f737cbfc11c9a9a6ede0e7e767115db27db9ae2876a58d45a84",
+    "figures/fig1_geometry.pdf": "2cf3a5e7cd17b2c28f749a09c37cfa87ba01dbe6aedbd7eb20d840df08a80e28",
+    "figures/fig2_simulation.pdf": "dcb5e2971f880a6c0c61677d1ca2ed1628ccbf34e59be3e69ac10831589d37d1",
+    "figures/fig3_datasets.pdf": "84f2e16e99ded4169488185e61209ce0724c7214594ca623d5bc3aae460d1fcf",
+    "figures/fig4_loss_comparison.pdf": "d7548191d7a7015e519fc4315adcbc0ed0acf8c1ed5cc6e4fd48da64a8c3a3e4",
+    "figures/fig5_calibration.pdf": "6c06d3454a95f10312d6e2e8fd849cbcf8401770838f2fd7db74a0d37f9c6a12",
+    "figures/fig6_meta.pdf": "7b895e3fd1423527aa2d89db07257795d408bddc7e1e731262d06a94d31271b4",
+    "figures/fig1_geometry.svg": "a855271da976595e8f7dec8c58eb736b00b404cc3aff4a386bedf540af2100ea",
+    "figures/fig2_simulation.svg": "57962e46c3f31373fa4ce7f329cd738a1b685273728ddc0e3a9cfccb272ce772",
+    "figures/fig3_datasets.svg": "08c48a7d86cbfdac909971732d149a3664276e44deb8ba8fe9d05b38781ad415",
+    "figures/fig4_loss_comparison.svg": "a1757b21f36fca332129c2f723f853c48567be06204aaeebe19639aa0c5ccafd",
+    "figures/fig5_calibration.svg": "59221e67ccc7b5c7e138e3b0594e87f423dc6298b4fa8830e933414d8c866a18",
+    "figures/fig6_meta.svg": "1752dc1b0a648f547fb3f397de3416f5a7535866a4cf2e9226f961246f73b2db"
+  },
+  "commands": [
+    "python analysis/final_analysis.py",
+    "python analysis/mixed_model_final.py",
+    "python figures/make_figures.py",
+    "python analysis/make_final_supplement.py"
+  ]
+}

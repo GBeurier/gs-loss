@@ -17,7 +17,7 @@ from .experiment import _make_model, _standardize
 from .metrics import pearson
 from .models.classical import GBLUP  # noqa: F401  (documents the no-tuning case)
 
-NN_ARCHS = ["mlp", "cnn", "transformer"]
+NN_ARCHS = ["mlp", "cnn", "transformer", "deepgs", "dnngp", "pnngs", "soydngp"]
 
 NN_SPACES = {
     "mlp": {"hidden_dims": [(64,), (128, 32), (256, 64), (256, 128, 32), (512, 128)],
@@ -26,6 +26,15 @@ NN_SPACES = {
             "first_stride": [4, 8, 16], "fc_dim": [32, 64, 128], "dropout": [0.1, 0.2, 0.3]},
     "transformer": {"n_tokens": [32, 64, 128], "d_model": [32, 64], "n_heads": [2, 4],
                     "n_layers": [1, 2], "dropout": [0.1, 0.2]},
+    # Literature architectures: structural params anchored on each paper's default,
+    # with a light search; the optimizer (COMMON) is tuned as for the other nets.
+    "deepgs": {"n_filters": [8, 16], "kernel_size": [11, 18], "fc_dim": [32, 64],
+               "dropout": [0.1, 0.2]},
+    "dnngp": {"channels": [(16, 16, 16), (32, 32, 32)], "kernel_size": [4],
+              "fc_dim": [64, 128], "dropout": [0.1, 0.2]},
+    "pnngs": {"n_paths": [3, 4], "channels": [8, 16], "stem_stride": [4, 8],
+              "dropout": [0.3, 0.5]},
+    "soydngp": {"side": [96], "width": [16, 32], "dropout": [0.3]},
 }
 COMMON = {"lr": [3e-3, 1e-3, 3e-4], "weight_decay": [1e-3, 1e-4, 1e-5], "batch_size": [64, 128, 256]}
 CLS_SPACES = {
@@ -43,12 +52,21 @@ def _choice(rng, values):
     return v.item() if isinstance(v, np.generic) else v
 
 
-def _sample_nn(arch, rng):
+def sample_nn_params(arch, rng):
+    """Sample one neural configuration from the registered discrete search space."""
     ak = {k: _choice(rng, v) for k, v in NN_SPACES[arch].items()}
     p = {"arch_kwargs": ak, "max_epochs": 150, "patience": 15}
     for k, v in COMMON.items():
         p[k] = _choice(rng, v)
+    if arch == "dnngp":                  # DNNGP reduces with a PCA front end (fit on train)
+        p["pca"] = 0.95
+    if arch == "soydngp":                # heavy 2D net: cap batch for memory
+        p["batch_size"] = min(p["batch_size"], 128)
     return p
+
+
+# Backwards-compatible private name used by older result-generation scripts.
+_sample_nn = sample_nn_params
 
 
 def _eval_config(X, y, name, params, n_folds, seed, is_nn):
@@ -82,7 +100,7 @@ def tune_model(X, y, name, n_trials=12, n_folds=3, seed=0):
             combos.append({k: _choice(rng, space[k]) for k in keys})
         candidates = combos
     else:
-        candidates = [_sample_nn(name, rng) for _ in range(n_trials)]
+        candidates = [sample_nn_params(name, rng) for _ in range(n_trials)]
 
     best, best_score = candidates[0], -np.inf
     for params in candidates:

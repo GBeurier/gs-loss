@@ -65,3 +65,20 @@ SMOKE = GridConfig(
 # losses.
 FULL = GridConfig(name="full", max_traits_per_species=None, n_repeats=2,
                   hpo_trials=8, hpo_folds=2)
+
+# Second-campaign ("S2, fair") config: every architecture is re-tuned at a heavy
+# HPO budget (128 trials x 3 folds) and the published literature networks
+# (DeepGS/DNNGP/PNNGS/SoyDNGP) are added alongside MLP/CNN/Transformer, so the
+# neural-vs-GBLUP comparison is fair under intensive tuning. Transformer and the
+# four literature nets run on every species. Written to its own results/HPO files
+# so the K=8 main grid (Palier 1) stays reproducible.
+_ALL_SPECIES = list(EASYGESE_SPECIES) + ["wheat", "soynam"]
+CAMPAIGN = GridConfig(
+    name="campaign",
+    max_traits_per_species=None,
+    nn_archs=["mlp", "cnn", "transformer", "deepgs", "dnngp", "pnngs", "soydngp"],
+    transformer_species=_ALL_SPECIES,        # every arch in nn_archs runs on every species
+    n_repeats=2,
+    hpo_trials=128,
+    hpo_folds=3,
+)

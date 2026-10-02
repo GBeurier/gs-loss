@@ -1,0 +1,30 @@
+\begin{longtable}{llrrrr}
+\caption{Loss-specific nested-HPO sensitivity on CIMMYT wheat; repeated outcomes are summarized descriptively.} \label{tab:s-final-nested} \\
+\toprule
+metric & model & mean delta & minimum & maximum & pairs \\
+\midrule
+\endfirsthead
+\caption[]{Loss-specific nested-HPO sensitivity on CIMMYT wheat; repeated outcomes are summarized descriptively.} \\
+\toprule
+metric & model & mean delta & minimum & maximum & pairs \\
+\midrule
+\endhead
+\midrule
+\multicolumn{6}{r}{Continued on next page} \\
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
+pearson & pooled & 0.0093 & -0.0121 & 0.0785 & 180 \\
+pearson & mlp & 0.0038 & -0.0025 & 0.0097 & 60 \\
+pearson & cnn & -0.0044 & -0.0119 & 0.0001 & 60 \\
+pearson & transformer & 0.0286 & -0.0121 & 0.0785 & 60 \\
+ndcg@10 & pooled & 0.0027 & -0.0345 & 0.0377 & 180 \\
+ndcg@10 & mlp & 0.0071 & 0.0016 & 0.0151 & 60 \\
+ndcg@10 & cnn & -0.0060 & -0.0198 & 0.0128 & 60 \\
+ndcg@10 & transformer & 0.0069 & -0.0345 & 0.0377 & 60 \\
+nrmse & pooled & -0.0012 & -0.0312 & 0.0124 & 180 \\
+nrmse & mlp & -0.0015 & -0.0038 & 0.0036 & 60 \\
+nrmse & cnn & 0.0073 & 0.0037 & 0.0124 & 60 \\
+nrmse & transformer & -0.0096 & -0.0312 & 0.0011 & 60 \\
+\end{longtable}

@@ -1,1 +1,26 @@
-Genomic prediction models are trained almost universally to minimize the mean squared error (MSE), yet they are evaluated, and used for selection, by the Pearson correlation $r$ between predicted and observed phenotypes and by genotype ranking. That maximizing $r$ equals minimizing the MSE of standardized variables, $\mathrm{MSE}(z_y,z_{\hat y})=2(1-r)$, is elementary, and correlation, concordance (CCC) and ranking losses have been used before; our contribution is a systematic, calibration- and selection-metric-aware empirical characterization of these losses across 101 trait--dataset combinations from 12 panels/sources spanning 10 species (EasyGeSe, CIMMYT wheat, SoyNAM), with a closed-form affine recalibration. We use it only as a stable training target; one affine map restores scale and offset, leaving $r$ and all rankings unchanged whenever the validation-fitted map is increasing, which holds in $>99\%$ of folds ($r$-sign flips in only $0.91\%$). Holding architecture, splits and tuning fixed so that only the loss differs, and comparing each architecture against its own MSE baseline, correlation and CCC losses raised predictive ability (cell-level $\Delta r$ from $+0.038$ to $+0.044$; Holm-corrected paired Wilcoxon $p<10^{-7}$, corroborated by a mixed model whose confidence intervals exclude zero) and selection metrics (NDCG@10 $+0.016$; relative efficiency $+0.04$). The benefit is strongly architecture-dependent --- large for the Transformer and CNN, negligible for the MLP. Only CCC lowered pooled calibrated RMSE in the per-cell bootstrap (not corroborated by the mixed model). No neural loss unseated the GBLUP or ridge baselines on mean rank. Correlation-consistent training is thus a useful, well-characterized tool, not a universal replacement for MSE.
+Genomic prediction networks are usually trained by mean squared error (MSE),
+although predictive ability is commonly evaluated by Pearson correlation and
+candidate ranking. We use the identity
+$\mathrm{MSE}(z_y,z_{\hat y})=2(1-r)$ to implement a stable differentiable
+Pearson objective and ask whether aligning training with evaluation improves
+neural genomic prediction. A shared-configuration ablation compared MSE,
+Pearson, hybrid and concordance-correlation losses for seven architectures on
+101 public trait--dataset tasks from 12 panels spanning ten species. Folds were
+averaged before inference; effects were balanced across panels and uncertainty
+was obtained by panel-cluster bootstrap. Relative to MSE, Pearson training gave
+a small positive raw-correlation estimate of $0.0048$ (95\% cluster bootstrap
+interval $0.0008$--$0.0091$), while an exact 12-panel sign-flip test was just
+above the conventional threshold ($p=0.052$). Raw Pearson predictions were
+poorly scaled (normalized-RMSE change $+0.346$ relative to raw MSE), but
+validation-fitted affine calibration removed this penalty ($-0.0033$) without
+materially changing correlation. The corresponding change in NDCG@$10$ was
+only $0.0018$ ($-0.0001$--$0.0035$). Estimates varied across architectures: the Transformer had
+the clearest positive contrast ($+0.0176$), whereas the DeepGS-inspired network
+had a negative contrast ($-0.0067$); the global loss-by-architecture interaction
+was inconclusive. A separate loss-specific nested-HPO sensitivity for MLP, CNN
+and Transformer on CIMMYT wheat supported a Transformer signal but not a uniform benefit and revealed
+material seed variability. Affine calibration restored phenotypic scale, although an
+unconstrained negative validation slope occasionally reversed rankings. Thus a
+differentiable Pearson loss is feasible and can help particular networks, but
+its average benefit is small and neither automatic nor sufficient to establish
+better breeding decisions.

@@ -20,6 +20,8 @@ results/*.parquet
 !results/results_main_full.parquet
 !results/results_batch_full.parquet
 !results/results_splits_full.parquet
+!results/results_main_campaign.parquet
+!results/results_loss_specific_wheat.parquet
 results/analysis/lmm_long.csv
 *.log
 _*.log

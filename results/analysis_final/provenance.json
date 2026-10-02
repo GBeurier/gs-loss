@@ -1,0 +1,31 @@
+{
+  "main_file": "results/results_main_campaign.parquet",
+  "main_rows": 90900,
+  "tasks": 101,
+  "panels": 12,
+  "neural_models": [
+    "mlp",
+    "cnn",
+    "transformer",
+    "deepgs",
+    "dnngp",
+    "pnngs",
+    "soydngp"
+  ],
+  "losses": [
+    "mse",
+    "pearson",
+    "hybrid",
+    "ccc"
+  ],
+  "fold_rows_per_task_model_loss": 10,
+  "primary_endpoint": "raw Pearson",
+  "scale_endpoint": "affine RMSE / test-fold phenotype SD",
+  "nested_file": "results/results_loss_specific_wheat.parquet",
+  "nested_rows": 1080,
+  "notes": [
+    "Main campaign uses one fixed training seed; folds are averaged.",
+    "Nested sensitivity uses seeds 0, 1, and 2.",
+    "No SelGenPalm data or results are included."
+  ]
+}

@@ -11,6 +11,7 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{microtype}
 \usepackage{xcolor}
+\emergencystretch=2em
 \newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
 \newcommand{\NUM}[1]{#1} % filled from results
 
@@ -83,6 +84,12 @@ both well posed and numerically stable. The remaining objection to a correlation
 loss, that it ignores scale and offset, is real but easily and provably remedied
 by an affine recalibration applied after training.
 
+The empirical question therefore has a simple three-stage structure: compare
+the usual MSE-trained raw predictions with Pearson-trained raw predictions to
+measure correlation alignment, then calibrate the Pearson outputs on validation
+data to recover phenotypic scale. Figure~\ref{fig:loss} carries this structure
+through to the headline result.
+
 \paragraph{Contributions.}
 \begin{enumerate}
 \item \textbf{A standardized-MSE Pearson loss (Section~\ref{sec:prop1}).} We give
@@ -91,9 +98,8 @@ differentiable training objective, verified numerically (to single-precision
 tolerance for the loss; to float64 machine precision for the calibration identity).
 \item \textbf{Affine calibration with a closed form
 (Section~\ref{sec:prop2}).} We prove that the optimal post-hoc affine map yields
-residual error $\sigma_y^2(1-r^2)$ and restores scale and offset while preserving
-$r$ and all rankings --- turning the scale-invariance ``weakness'' of correlation
-into a controlled, two-parameter calibration step.
+residual error $\sigma_y^2(1-r^2)$ on the fitting sample and restores scale and
+offset while preserving $r$ and rankings whenever the fitted slope is positive.
 \item \textbf{Mini-batch analysis (Section~\ref{sec:prop3}).} We show the
 mini-batch Pearson loss is a biased surrogate for the global objective and
 quantify the effect of batch size empirically.
@@ -136,8 +142,9 @@ because $\tfrac1n\sum_i z_{x,i}^2 = 1$ by construction and
 $\tfrac1n\sum_i z_{y,i} z_{\hat y,i}=r$.
 \end{proof}
 This gives the loss $\mathcal{L}_{\mathrm{P}}(\hat y,y) = 1-r(\hat y,y)$,
-implemented as $\tfrac12\,\mathrm{MSE}(z_y,z_{\hat y})$ with a small $\varepsilon$
-guarding the standardization denominators. It is differentiable everywhere
+implemented directly with a small $\varepsilon$ guarding the standard-deviation
+denominators and numerically equivalent to
+$\tfrac12\,\mathrm{MSE}(z_y,z_{\hat y})$. It is differentiable everywhere
 $\sigma_{\hat y}>0$; we verify the gradient against finite differences and verify
 the identity to single-precision tolerance in Section~\ref{sec:res-numerical}. The
 negative-correlation loss $-r$ differs from $\mathcal{L}_{\mathrm{P}}$ by a
@@ -174,8 +181,10 @@ and leaves correlation-type and rank-based statistics unchanged.
 We fit $(a^\star,b^\star)$ on held-out validation predictions (never on the test
 set) and apply them to the test predictions. Isotonic regression provides a
 monotone non-linear alternative when the raw-vs-true relationship is monotone but
-curved. Calibration cannot change $r$ but can dramatically improve RMSE, bias and
-the calibration slope (Figure~\ref{fig:simulation}; Section~\ref{sec:res-calibration}).
+curved. A positive affine map preserves $r$; a negative affine slope changes its
+sign, and nonlinear isotonic calibration can change its magnitude. Calibration
+can nonetheless improve RMSE, bias and slope (Figure~\ref{fig:simulation};
+Section~\ref{sec:res-calibration}).
 
 \begin{figure}[tbp]\centering
 \IfFileExists{figures/fig2_simulation.pdf}{\includegraphics[width=\linewidth]{figures/fig2_simulation.pdf}}{}
@@ -191,13 +200,13 @@ overlap is identical before and after (right).}
 For a partition of the data into batches $B_1,\dots,B_K$, the batch-averaged loss
 $\tfrac1K\sum_k \bigl(1-r_{B_k}\bigr)$ is not equal to $1-r_{\mathrm{global}}$ in
 general, because $r$ is a non-linear (ratio-of-moments) functional of the data.
-The discrepancy and the variance of the gradient estimate grow as the batch size
-decreases.
+Because the functional is nonlinear, neither equality nor a monotonic relation
+between batch size and discrepancy is guaranteed without further assumptions.
 \end{proposition}
-A full-batch (or large-batch) evaluation of $\mathcal{L}_{\mathrm{P}}$ therefore
-optimizes the global objective, whereas small batches optimize a noisier
-surrogate. We quantify the practical consequence for training stability and
-predictive ability in Section~\ref{sec:res-batch}.
+A full-batch evaluation of $\mathcal{L}_{\mathrm{P}}$ optimizes the global
+objective exactly; a large batch is an approximation, and smaller batches
+optimize a noisier surrogate. A supporting experiment quantifies the practical
+effect over the tested range.
 
 \subsection{Multi-trait and group-aware variants}\label{sec:groupaware}
 The loss extends naturally to $T$ traits, $\mathcal{L}=\tfrac1T\sum_{t=1}^T
@@ -217,9 +226,9 @@ providing genotypes, phenotypes and \emph{fixed} cross-validation partitions; th
 maize set is the global genotype-by-environment competition panel
 \citep{washburn2025maize}. (ii) The CIMMYT \emph{wheat} panel
 \citep{crossa2010}: 599 lines, 1{,}279 DArT markers and grain yield in four
-environments, used for cross-environment transfer. (iii) \emph{SoyNAM}
+environments, analyzed as four outcomes. (iii) \emph{SoyNAM}
 \citep{xavier2016soynam}: $\sim$5{,}500 recombinant inbred lines in 40 biparental
-families, used for leave-family-out prediction. Genotypes are coded as allele
+families, analyzed for four agronomic traits. Genotypes are coded as allele
 dosages; preprocessing (unsupervised, no phenotype) applies a minor-allele
 frequency filter ($\geq 0.01$), mean imputation, and a top-variance cap at
 20{,}000 markers for the seven panels whose marker count exceeded 20{,}000
@@ -270,10 +279,17 @@ $K=XX^\top/p$ and validated against the \texttt{rrBLUP} package
 \citep{endelman2011} to floating-point precision (cross-implementation
 correlation $1.0000$). We also include ridge regression as a linear baseline. The neural predictors
 are a multilayer perceptron (MLP), a one-dimensional convolutional network over
-ordered markers (1D-CNN), and a light Transformer over marker patches. Crucially,
-\emph{the architecture is held fixed across losses}: it is tuned once per
-(dataset, model) with a neutral MSE objective and then frozen, so that the only
-thing that changes in the loss comparison is the loss.
+ordered markers (1D-CNN), a light Transformer over marker patches, and four
+protocol-matched, literature-inspired adaptations: DeepGS
+\citep{ma2018deepgs}, DNNGP \citep{wang2023dnngp}, PNNGS \citep{pnngs2024}, and
+SoyDNGP \citep{gao2023soydngp}. These are not exact reproductions: they retain
+published motifs while using common dosage inputs, preprocessing, training and
+evaluation. For the primary ablation, one configuration is selected per dataset
+registry key and architecture under MSE and frozen across losses. EasyGeSe and
+CIMMYT use one representative trait per panel and transfer it to the other
+traits; the four SoyNAM phenotypes are separate registry keys and are tuned on
+their own phenotype. The contrast changes only the loss conditional on the
+configuration, but selection under MSE may favor MSE.
 
 \paragraph{Loss functions.} We compare MSE; the standardized-MSE Pearson loss
 $1-r$ (Proposition~\ref{prop:1}); a hybrid $\,(1-r)+\lambda\,\mathrm{MSE}\,$ with
@@ -286,53 +302,55 @@ three post-hoc maps: raw (identity), affine (Proposition~\ref{prop:2}) and
 isotonic. Calibrators are fit on validation predictions only.
 
 \paragraph{Cross-validation.} We use the fixed EasyGeSe partitions (5 folds
-$\times$ 2 repeats $=$ 10 folds per trait), repeated $K$-fold for wheat and SoyNAM, leave-family-out for
-SoyNAM, and cross-environment transfer for wheat. Within each training fold an
-inner 80/20 split (group-aware for family CV) provides early-stopping and
+$\times$ 2 repeats $=$ 10 folds per trait) and repeated $K$-fold for wheat and
+SoyNAM. Within each training fold an inner 80/20 split provides early-stopping and
 calibration data; markers are standardized with training statistics only;
 targets are standardized with training statistics for the neural networks and
 predictions are returned in the original units. Neural networks early-stop on the
 validation value of the loss being trained. The test fold is never used for
-fitting, early stopping, calibration or hyper-parameter selection.
+fitting, early stopping or calibration. Primary hyper-parameters, however, were
+selected before outer CV on the full tuning phenotype described above, so
+absolute performance is not a nested estimate. In a separate CIMMYT sensitivity,
+MSE and Pearson each received the same eight-candidate bank inside five outer
+folds using only environment-1 outer-training observations; configurations were
+evaluated in four environments with three initialization seeds.
 
 \paragraph{Evaluation metrics.} Predictive: Pearson $r$, Spearman $\rho$, RMSE,
 MAE, $R^2$, mean bias, and the calibration slope and intercept (ideal $1$ and
-$0$). Selection-aware, at intensities $k\in\{5,10,15,20\}\%$: top-$k$ overlap,
+$0$). Upper-tail ranking, at intensities $k\in\{5,10,15,20\}\%$: top-$k$ overlap,
 precision@$k$, recall@$k$, NDCG@$k$ \citep{jarvelin2002ndcg}, selection
 differential, mean phenotype of the selected, and relative efficiency (achieved
-gain divided by the oracle gain).
+upper-tail differential divided by the oracle differential). Larger phenotypes
+are always the target; these metrics are not interpreted as breeding gain when
+lower or intermediate values are desirable.
 
-\paragraph{Statistical analysis.} For each cell we average over folds and form
-$\Delta m = m_{\mathrm{loss}}-m_{\mathrm{MSE}}$ within the same architecture.
-We report bootstrap confidence intervals (bias-corrected and accelerated, BCa,
-when $n\geq12$; the percentile bootstrap otherwise, as for the $n=8$ sorghum
-contrast), paired Wilcoxon tests with
-Holm and Benjamini--Hochberg \citep{benjamini1995} correction, and mean method
-ranks. As a corroborative analysis we fit a linear mixed model
-\citep{bates2015lme4} on cell-level means (one observation per
-dataset$\times$trait$\times$model$\times$loss, which avoids fold-level
-pseudoreplication), $\textit{metric}\sim \textit{loss}+\textit{model}+(1\mid
-\textit{dataset})+(1\mid \textit{dataset:trait})$ with MSE as the reference level.
-The primary inference is the cell-level paired contrast; the mixed model only
-corroborates it. (We do not interpret a split-scheme effect in this model, as
-scheme is confounded with dataset source; difficult-split generalization is
-addressed directly in Section~\ref{sec:res-splits}.)
+\paragraph{Statistical analysis.} For each task, architecture and loss we first
+average the ten fold values and form
+$\Delta m=m_{\mathrm{loss}}-m_{\mathrm{MSE}}$. The pooled contrast averages the
+seven architectures within task. The primary estimand gives equal weight to each
+of 12 panels; a trait-weighted estimand is a sensitivity check. Confidence
+intervals resample panels as clusters (20,000 replicates), and an exact two-sided
+sign-flip test reverses all task contrasts within a panel together.
+Leave-one-panel-out ranges assess influence. A corroborative mixed model of the
+paired deltas contains loss, architecture, their interaction, panel as a blocking
+factor and a random task intercept; a likelihood-ratio test compares models with
+and without the interaction. Raw Pearson is the prespecified primary endpoint,
+raw NDCG@$10$ is secondary, and RMSE is normalized by the test-fold phenotype
+standard deviation after validation-fitted affine calibration. The nested-HPO
+experiment covers MLP, CNN and Transformer only and is analyzed separately and descriptively because its environments,
+folds and seeds are repeated measures from one wheat panel.
 
 \paragraph{Implementation.} The framework is released as the Python package
 \texttt{ccgp}, built on PyTorch \citep{paszke2019pytorch}, scikit-learn
 \citep{pedregosa2011sklearn} and NumPy
 \citep{harris2020numpy}, with the neural networks trained using the Adam optimizer
-\citep{kingma2015adam}, fixed seeds, the exact CV
-partitions, tuned configurations and a pinned environment. \emph{Limitation:}
-hyper-parameters are tuned on full-data validation splits with a neutral MSE
-objective and frozen across losses; because the architecture is shared
-identically by every loss, this cannot bias the relative (loss/calibration)
-comparisons that constitute our claims, though it may mildly and symmetrically
-inflate absolute accuracies.
+\citep{kingma2015adam}, deterministic split definitions and recorded tuned
+configurations. The main campaign used one initialization per fold; only the
+nested wheat sensitivity used three seeds. Analysis scripts validate the
+90,900-row campaign and 1,080-row nested result files before producing tables
+and machine-readable figure source data.
 
 \input{sec_results.tex}
-
-\input{sec_sorghum.tex}
 
 \input{discussion_body.tex}
 
@@ -340,31 +358,25 @@ inflate absolute accuracies.
 A standardized-MSE Pearson loss aligns neural-network training with the
 predictive-ability metric used throughout genomic prediction; because correlation
 is scale-free, affine calibration or a hybrid loss is required when calibrated
-phenotypic values matter; and for breeding decisions, global correlation should
-be complemented by top-$k$ and ranking-aware metrics. Empirically, across 101
-trait--datasets the benefit of correlation-consistent training is real but
-architecture-dependent --- substantial for CNNs and Transformers, negligible for a
-well-tuned MLP --- and on these benchmarks no neural loss unseated GBLUP or ridge
-on mean rank. The framework is thus a principled, well-characterized tool to be
-applied judiciously, not a universal replacement for MSE.
+phenotypic values matter; and global correlation should be complemented by
+decision-specific metrics. Empirically, across 101 trait--datasets the average
+benefit is small, sensitive to panel weighting, and not uniform across
+architectures. The clearest descriptive signal occurs for the Transformer,
+while DeepGS provides a negative counterexample, and no neural loss unseated
+GBLUP or ridge on mean rank. The framework is a principled objective to test,
+not a universal replacement for MSE.
 
 \section*{Data and code availability}
 All datasets are public: EasyGeSe (Zenodo, DOI \texttt{10.5281/zenodo.15348871}), the CIMMYT wheat panel
 (\texttt{BGLR} R package \citep{perez2014bglr}) and SoyNAM (\texttt{SoyNAM} R package). Code, fixed
-cross-validation partitions, tuned configurations and a pinned environment are
+cross-validation partitions, tuned configurations and a recorded runtime manifest are
 released as the \texttt{ccgp} package, with source at
 \url{https://github.com/GBeurier/gs-loss} (a versioned archive will be
-deposited at Zenodo, DOI to be assigned). The sorghum case-study data
-(Section~\ref{sec:res-sorghum}) are proprietary and not redistributed; all other
-datasets are public and download automatically. Supporting Information (File~S1,
-\texttt{supplement.pdf}) contains Tables~S1--S11 and Figures~S1--S5, generated
-directly from the deposited result files: the numerical verification of the
-equivalences (Experiment~A), the hyper-parameter search spaces and selected
-configurations, the complete $\Delta$-versus-MSE tables for every predictive and
-selection metric (pooled and per architecture), the confirmatory mixed-model
-coefficients, mean method ranks, calibration diagnostics, the selection-at-$k$
-analysis, the minibatch-size study (Experiment~E), the difficult-splits study
-(Experiment~F) and a per-(dataset, trait) results table.
+deposited at Zenodo, DOI to be assigned). All datasets used in the reported
+benchmark are public and download automatically. Supporting Information (File~S1,
+\texttt{supplement.pdf}) documents the architecture adaptations, complete paired
+contrasts, missingness, HPO provenance, calibration, mean ranks and nested wheat
+sensitivity. Machine-readable source tables accompany every data-driven figure.
 
 \bibliographystyle{apalike}
 \bibliography{refs}
