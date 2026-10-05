@@ -1,29 +1,22 @@
 Genomic prediction involves three objectives that are often conflated:
-association with phenotype, calibration to the phenotypic scale, and recovery of
+predictive correlation, calibration to the phenotypic scale, and recovery of
 selection candidates. Neural predictors are usually trained by mean squared
-error (MSE), although predictive ability is commonly evaluated by Pearson
-correlation and candidate ranking. We use the identity
+error (MSE), predictive ability is commonly reported as Pearson correlation, and
+selection ultimately depends on candidate ranking. We use the identity
 $\mathrm{MSE}(z_y,z_{\hat y})=2(1-r)$ to implement a stable differentiable
-Pearson objective and ask what is gained, and what is not, by aligning the
-training objective with the correlation metric. A shared-configuration ablation compared MSE,
-Pearson, hybrid and concordance-correlation losses for seven architectures on
-101 public trait--dataset tasks from 12 panels spanning ten species. Folds were
-averaged before inference; effects were balanced across panels and uncertainty
-was obtained by panel-cluster bootstrap. Relative to MSE, Pearson training gave
-a small positive raw-correlation estimate of $0.0048$ (95\% cluster bootstrap
-interval $0.0008$--$0.0091$), while an exact 12-panel sign-flip test was just
-above the conventional threshold ($p=0.052$). Raw Pearson predictions were
-poorly scaled (normalized-RMSE change $+0.346$ relative to raw MSE), but
-validation-fitted affine calibration removed this penalty ($-0.0033$) without
-materially changing correlation. The corresponding change in NDCG@$10$ was
-only $0.0018$ ($-0.0001$--$0.0035$). Estimates varied across architectures: the Transformer had
-the clearest positive contrast ($+0.0176$), whereas the DeepGS-inspired network
-had a negative contrast ($-0.0067$); the global loss-by-architecture interaction
-was inconclusive. A separate loss-specific nested-HPO sensitivity for MLP, CNN
-and Transformer on CIMMYT wheat supported a Transformer signal but not a uniform benefit and revealed
-material seed variability. Affine calibration restored phenotypic scale, although an
-unconstrained negative validation slope occasionally reversed rankings. Thus a
-differentiable Pearson loss is feasible, but metric-consistent training is most
-useful as part of a workflow in which objective alignment, calibration and
-selection performance are evaluated separately rather than as a universal
-replacement for MSE.
+Pearson objective and ask what is gained, and what is not, by aligning training
+with correlation. We compared MSE, Pearson, hybrid, and concordance-correlation
+losses for seven architectures on 101 public trait--dataset tasks from 12 panels
+spanning ten species. Relative to MSE, Pearson training increased raw
+correlation by 0.0048 (95\% panel-cluster bootstrap interval 0.0008--0.0091;
+exact 12-panel sign-flip $p=0.052$). Raw Pearson predictions were poorly scaled,
+but validation-fitted affine calibration removed this penalty while retaining
+the correlation gain. The corresponding change in NDCG@$10$ was only 0.0018
+($-0.0001$--0.0035), showing that improved global predictive ability did not
+substantially alter upper-tail recovery. Effects varied across architectures:
+the Transformer showed the clearest positive contrast ($+0.0176$), whereas the
+DeepGS-inspired network was negative ($-0.0067$), although the global
+interaction was inconclusive. Thus Pearson loss provides a feasible
+metric-consistent objective, but predictive correlation, phenotypic calibration,
+and selection performance should be treated as distinct targets rather than
+assuming that improvement in one transfers to the others.

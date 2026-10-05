@@ -20,12 +20,12 @@
 \author[$\ast$,$\dagger$]{Lauriane Rouan}
 \author[$\ast$,$\dagger$]{David Cros}
 
-\affil[$\ast$]{CIRAD, UMR AGAP Institut, Montpellier, France}
+\affil[$\ast$]{CIRAD, UMR AGAP Institut, Avenue Agropolis, 34398 Montpellier Cedex 5, France}
 \affil[$\dagger$]{UMR AGAP Institut, Univ Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France}
 
 \keywords{genomic prediction \\ genomic selection \\ deep learning \\ loss functions \\ calibration}
 
-\runningtitle{Metric-consistent neural networks for genomic prediction}
+\runningtitle{Metric-consistent genomic prediction}
 
 \runningauthor{Beurier \textit{et al.}}
 
@@ -42,7 +42,7 @@
 \marginmark
 \firstpagefootnote
 
-\correspondingauthoraffiliation{1}{Corresponding author: CIRAD, UMR AGAP Institut, Montpellier, France. E-mail: gregory.beurier@cirad.fr}
+\correspondingauthoraffiliation{1}{Corresponding author: CIRAD, UMR AGAP Institut, Avenue Agropolis, 34398 Montpellier Cedex 5, France. E-mail: gregory.beurier@cirad.fr}
 \vspace{-34pt}% Only used for adjusting extra space in the left column of the first page
 
 \section{Introduction}
@@ -88,9 +88,9 @@ by an affine recalibration applied after training.
 The empirical question therefore has a simple three-stage structure: compare
 the usual MSE-trained raw predictions with Pearson-trained raw predictions to
 measure correlation alignment, then calibrate the Pearson outputs on validation
-data to recover phenotypic scale, and finally ask whether either step changes
-the selected upper tail. Figure~\ref{fig:loss} carries this structure through to
-the headline result.
+data to recover phenotypic scale, and finally evaluate separately whether
+correlation-aligned training changes upper-tail selection. Figure~\ref{fig:loss}
+carries this structure through to the headline result.
 
 \subsubsection{Contributions:}
 \begin{enumerate}
@@ -116,7 +116,7 @@ public and all code, splits and tuned configurations are released.
 
 \noindent We do not claim that a Pearson loss is uniformly superior to MSE; that
 would be false. We provide a principled, reproducible framework for training,
-calibrating and evaluating neural genomic predictors by treating association,
+calibrating and evaluating neural genomic predictors by treating predictive correlation,
 phenotypic scale and selection as related but distinct objectives.
 
 \section{Theory}\label{sec:theory}
@@ -293,7 +293,7 @@ The framework is released as the Python package
 nested wheat sensitivity used three. Analysis scripts validate 90,900 primary
 and 1,080 nested rows before generating tables and figure source data.
 
-\subsection{Data Availability}
+\subsection{Data availability}
 All datasets are public: EasyGeSe (Zenodo, DOI \texttt{10.5281/zenodo.15348871}), the CIMMYT wheat panel
 (\texttt{BGLR} R package \citep{perez2014bglr}) and SoyNAM (\texttt{SoyNAM} R package). Code, fixed
 cross-validation partitions, tuned configurations and a recorded runtime manifest are
@@ -311,8 +311,8 @@ wheat sensitivity; machine-readable source tables accompany the figures.
 \section{Conclusion}
 A standardized-MSE Pearson loss aligns neural-network training with the
 predictive-ability metric used throughout genomic prediction; because correlation
-is scale-free, affine calibration or a hybrid loss is required when calibrated
-phenotypic values matter. Across 101 tasks the average benefit was small,
+is scale-free, a separate calibration step or a scale-aware objective is needed
+when calibrated phenotypic values matter. Across 101 tasks the average benefit was small,
 sensitive to panel weighting and not uniform across architectures. The
 Transformer gave the clearest descriptive signal, DeepGS a negative
 counterexample, and no neural loss displaced GBLUP or ridge on mean rank. The
@@ -354,11 +354,11 @@ overlap is identical before and after (right).}
 \renewcommand{\familydefault}{\sfdefault}\normalfont
 \centering
 \includegraphics[width=\linewidth]{figures/fig4_loss_comparison.pdf}
-\caption{The central empirical comparison. Panels A--C show that raw Pearson
+\caption{The central empirical comparison. Panels A--B show that raw Pearson
 predictions gain $0.0048$ in correlation but increase normalized RMSE by
 $0.346$ relative to raw MSE; affine calibration retains the correlation gain
-($+0.0047$) and removes the scale penalty ($-0.0033$), while raw NDCG@$10$
-changes by only $+0.0018$. Panel D reports estimates and 95\%
+($+0.0047$) and removes the scale penalty ($-0.0033$). Panel C shows that raw
+NDCG@$10$ changes by only $+0.0018$. Panel D reports estimates and 95\%
 panel-cluster bootstrap intervals for the pooled result and all seven
 architectures. Small points in A--C are contrasts for the 12 panels.}
 \label{fig:loss}

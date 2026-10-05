@@ -21,6 +21,12 @@ trait and the second an average panel. We use panel balance for the headline to
 avoid allowing heavily phenotyped resources to determine a cross-panel claim,
 and report both for transparency.
 
+CCC produced slightly larger pooled improvements in correlation and upper-tail
+ranking, consistent with its joint treatment of correlation, scale and offset.
+Pearson is therefore used here as the cleanest case of metric-consistent
+correlation training, rather than because it uniformly outperformed the
+alternative objectives.
+
 \subsection{Architecture heterogeneity is suggestive, not universal}
 Objective sensitivity may be architecture-dependent: the Transformer repeatedly
 shows the largest positive estimate, including after loss-specific nested tuning.

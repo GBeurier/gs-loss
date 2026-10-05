@@ -11,7 +11,7 @@ Genomic prediction models are trained almost universally by minimizing the mean
 squared error, yet they are evaluated with the Pearson correlation between
 predicted and observed phenotypes and used to rank candidate genotypes. Our
 manuscript separates three objectives that are often conflated in this workflow:
-association with phenotype, calibration to the phenotypic scale and recovery of
+predictive correlation, calibration to the phenotypic scale and recovery of
 selection candidates. It contributes:
 
 1. **A standardized-MSE Pearson loss.** We prove and numerically verify (to

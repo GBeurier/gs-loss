@@ -181,11 +181,16 @@ def fig4_loss_comparison(main, out):
              [["pearson", "nrmse", "ndcg@10"]].mean())
     strategy_order = [x[2] for x in conditions]
     rng = np.random.default_rng(20260903)
+    metric_strategy_orders = {
+        "pearson": strategy_order,
+        "nrmse": strategy_order,
+        "ndcg@10": strategy_order[:2],
+    }
     rows = []
-    for metric in ["pearson", "nrmse", "ndcg@10"]:
+    for metric, strategies in metric_strategy_orders.items():
         pivot = panel.pivot(index="panel", columns="strategy", values=metric)[strategy_order]
         baseline = pivot[strategy_order[0]].to_numpy()
-        for strategy in strategy_order:
+        for strategy in strategies:
             values = pivot[strategy].to_numpy()
             delta = values - baseline
             draws = rng.integers(0, len(delta), size=(20_000, len(delta)))
@@ -214,13 +219,14 @@ def fig4_loss_comparison(main, out):
     colors = ["#555555", CB["pearson"], CB["affine"]]
     markers = ["s", "o", "D"]
 
-    def effect_panel(axis, metric, title, xlabel, better):
+    def effect_panel(axis, metric, title, xlabel, better, strategies=None):
+        strategies = strategy_order if strategies is None else strategies
         pivot = panel.pivot(index="panel", columns="strategy", values=metric)[strategy_order]
         baseline = pivot[strategy_order[0]]
-        q = headline[headline.metric == metric].set_index("strategy").loc[strategy_order]
-        y = np.arange(3)
+        q = headline[headline.metric == metric].set_index("strategy").loc[strategies]
+        y = np.arange(len(strategies))
         jitter = np.linspace(-0.105, 0.105, len(pivot))
-        for i, strategy in enumerate(strategy_order):
+        for i, strategy in enumerate(strategies):
             delta = (pivot[strategy] - baseline).to_numpy()
             axis.scatter(delta, y[i] + jitter, s=13, color=colors[i], alpha=0.36,
                          edgecolor="none", zorder=1)
@@ -231,7 +237,7 @@ def fig4_loss_comparison(main, out):
                           fmt=markers[i], color=colors[i], mfc="white", mec=colors[i],
                           mew=1.3, ms=7, capsize=3, lw=1.5, zorder=3)
         axis.axvline(0, color="#555555", lw=0.9, ls=(0, (3, 2)), zorder=0)
-        axis.set_yticks(y, labels)
+        axis.set_yticks(y, labels[:len(strategies)])
         axis.invert_yaxis()
         axis.set_xlabel(xlabel)
         axis.set_title(title, loc="left", fontweight="bold")
@@ -245,7 +251,8 @@ def fig4_loss_comparison(main, out):
     effect_panel(ax_e, "nrmse", "B   Phenotypic-scale error",
                  "change in normalized RMSE vs MSE raw", "<- lower is better")
     effect_panel(ax_s, "ndcg@10", "C   Upper-tail recovery",
-                 r"change in NDCG@10 vs MSE raw", "higher is better ->")
+                 r"change in NDCG@10 vs MSE raw", "higher is better ->",
+                 strategies=strategy_order[:2])
     ax_r.text(0.98, 0.93, "+0.0048\n[0.0008, 0.0091]", transform=ax_r.transAxes,
               ha="right", va="top", color=CB["pearson"], fontsize=8, fontweight="bold")
     ax_e.text(0.98, 0.93, "raw: +0.346", transform=ax_e.transAxes,
@@ -286,7 +293,7 @@ def fig4_loss_comparison(main, out):
     ax_arch.set_title("D   All seven architectures", loc="left", fontweight="bold")
     ax_arch.set_xlim(-0.017, 0.043)
 
-    fig.suptitle("Pearson loss separates association, calibration, and selection effects",
+    fig.suptitle("Pearson loss separates correlation, calibration, and selection effects",
                  x=0.5, y=1.01, fontsize=13, fontweight="bold")
     fig.text(0.5, 0.008,
              "Small points (A-C): 12 panel contrasts. Open symbols: panel-balanced means. "
