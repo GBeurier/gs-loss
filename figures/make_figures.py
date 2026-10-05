@@ -174,15 +174,15 @@ def fig4_loss_comparison(main, out):
 
     # Preserve the inferential hierarchy: folds, then architectures, then traits within panels.
     task = (d.groupby(["panel", "dataset", "trait", "model", "strategy"], as_index=False)
-            [["pearson", "nrmse"]].mean()
+            [["pearson", "nrmse", "ndcg@10"]].mean()
             .groupby(["panel", "dataset", "trait", "strategy"], as_index=False)
-            [["pearson", "nrmse"]].mean())
+            [["pearson", "nrmse", "ndcg@10"]].mean())
     panel = (task.groupby(["panel", "strategy"], as_index=False)
-             [["pearson", "nrmse"]].mean())
+             [["pearson", "nrmse", "ndcg@10"]].mean())
     strategy_order = [x[2] for x in conditions]
     rng = np.random.default_rng(20260903)
     rows = []
-    for metric in ["pearson", "nrmse"]:
+    for metric in ["pearson", "nrmse", "ndcg@10"]:
         pivot = panel.pivot(index="panel", columns="strategy", values=metric)[strategy_order]
         baseline = pivot[strategy_order[0]].to_numpy()
         for strategy in strategy_order:
@@ -203,11 +203,12 @@ def fig4_loss_comparison(main, out):
     _source(out, "fig4_headline_strategy_summary", headline)
     _source(out, "fig4_headline_panel_values", panel)
 
-    fig = plt.figure(figsize=(11.2, 4.45))
-    gs = fig.add_gridspec(1, 3, width_ratios=[1.0, 1.08, 1.42], wspace=0.50)
+    fig = plt.figure(figsize=(12.8, 4.45))
+    gs = fig.add_gridspec(1, 4, width_ratios=[0.95, 1.02, 0.95, 1.35], wspace=0.55)
     ax_r = fig.add_subplot(gs[0, 0])
     ax_e = fig.add_subplot(gs[0, 1])
-    ax_arch = fig.add_subplot(gs[0, 2])
+    ax_s = fig.add_subplot(gs[0, 2])
+    ax_arch = fig.add_subplot(gs[0, 3])
 
     labels = ["MSE\nraw", "Pearson\nraw", "Pearson\n+ affine"]
     colors = ["#555555", CB["pearson"], CB["affine"]]
@@ -240,15 +241,19 @@ def fig4_loss_comparison(main, out):
         axis.tick_params(axis="y", length=0)
 
     effect_panel(ax_r, "pearson", "A   Predictive ability", r"change in Pearson $r$ vs MSE raw",
-                 "higher is better  →")
+                 "higher is better ->")
     effect_panel(ax_e, "nrmse", "B   Phenotypic-scale error",
-                 "change in normalized RMSE vs MSE raw", "←  lower is better")
+                 "change in normalized RMSE vs MSE raw", "<- lower is better")
+    effect_panel(ax_s, "ndcg@10", "C   Upper-tail recovery",
+                 r"change in NDCG@10 vs MSE raw", "higher is better ->")
     ax_r.text(0.98, 0.93, "+0.0048\n[0.0008, 0.0091]", transform=ax_r.transAxes,
               ha="right", va="top", color=CB["pearson"], fontsize=8, fontweight="bold")
     ax_e.text(0.98, 0.93, "raw: +0.346", transform=ax_e.transAxes,
               ha="right", va="top", color=CB["pearson"], fontsize=8, fontweight="bold")
     ax_e.text(0.98, 0.86, "affine: −0.0033", transform=ax_e.transAxes,
               ha="right", va="top", color=CB["affine"], fontsize=8, fontweight="bold")
+    ax_s.text(0.98, 0.93, "+0.0018\n[-0.0001, 0.0035]", transform=ax_s.transAxes,
+              ha="right", va="top", color=CB["pearson"], fontsize=8, fontweight="bold")
 
     summary = pd.read_csv("results/analysis_final/paired_summary.csv")
     architecture_order = ["pooled", "transformer", "pnngs", "soydngp", "mlp",
@@ -278,13 +283,13 @@ def fig4_loss_comparison(main, out):
     ax_arch.grid(axis="x", color="#E7E7E7", lw=0.7, zorder=0)
     ax_arch.tick_params(axis="y", length=0)
     ax_arch.set_xlabel(r"Pearson loss $-$ MSE ($\Delta r$)")
-    ax_arch.set_title("C   All seven architectures", loc="left", fontweight="bold")
+    ax_arch.set_title("D   All seven architectures", loc="left", fontweight="bold")
     ax_arch.set_xlim(-0.017, 0.043)
 
-    fig.suptitle("Pearson loss: a small average gain, a raw scale penalty, and heterogeneous network effects",
+    fig.suptitle("Pearson loss separates association, calibration, and selection effects",
                  x=0.5, y=1.01, fontsize=13, fontweight="bold")
     fig.text(0.5, 0.008,
-             "Small points (A–B): 12 panel contrasts. Open symbols: panel-balanced means. "
+             "Small points (A-C): 12 panel contrasts. Open symbols: panel-balanced means. "
              "Bars: 95% panel-cluster bootstrap intervals. Global interaction: $p=0.414$.",
              fontsize=7.5, ha="center")
     fig.subplots_adjust(left=0.08, right=0.985, bottom=0.19, top=0.84)

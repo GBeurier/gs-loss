@@ -1,9 +1,11 @@
-Genomic prediction networks are usually trained by mean squared error (MSE),
-although predictive ability is commonly evaluated by Pearson correlation and
-candidate ranking. We use the identity
+Genomic prediction involves three objectives that are often conflated:
+association with phenotype, calibration to the phenotypic scale, and recovery of
+selection candidates. Neural predictors are usually trained by mean squared
+error (MSE), although predictive ability is commonly evaluated by Pearson
+correlation and candidate ranking. We use the identity
 $\mathrm{MSE}(z_y,z_{\hat y})=2(1-r)$ to implement a stable differentiable
-Pearson objective and ask whether aligning training with evaluation improves
-neural genomic prediction. A shared-configuration ablation compared MSE,
+Pearson objective and ask what is gained, and what is not, by aligning the
+training objective with the correlation metric. A shared-configuration ablation compared MSE,
 Pearson, hybrid and concordance-correlation losses for seven architectures on
 101 public trait--dataset tasks from 12 panels spanning ten species. Folds were
 averaged before inference; effects were balanced across panels and uncertainty
@@ -21,6 +23,7 @@ was inconclusive. A separate loss-specific nested-HPO sensitivity for MLP, CNN
 and Transformer on CIMMYT wheat supported a Transformer signal but not a uniform benefit and revealed
 material seed variability. Affine calibration restored phenotypic scale, although an
 unconstrained negative validation slope occasionally reversed rankings. Thus a
-differentiable Pearson loss is feasible and can help particular networks, but
-its average benefit is small and neither automatic nor sufficient to establish
-better breeding decisions.
+differentiable Pearson loss is feasible, but metric-consistent training is most
+useful as part of a workflow in which objective alignment, calibration and
+selection performance are evaluated separately rather than as a universal
+replacement for MSE.

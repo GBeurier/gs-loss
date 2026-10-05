@@ -1,16 +1,18 @@
 \section{Discussion}\label{sec:discussion}
 
-\subsection{A valid objective with a modest empirical effect}
-The algebraic result is exact: minimizing standardized MSE maximizes Pearson
-correlation. The empirical result is more restrained. Once all seven networks
-are evaluated on the same 101 tasks and panels are equally weighted, Pearson
-training improves $r$ by about five thousandths. The cluster-bootstrap interval
-is positive, but an exact 12-panel sign-flip test lies at the conventional
-threshold. The raw Pearson outputs pay a large scale penalty; validation-fitted
-affine calibration removes it while leaving the correlation gain essentially
-intact. NDCG changes are smaller still. This sequence---align the objective,
-then restore scale---and the distinction between mathematical alignment and
-modest practical gain are the paper's main findings.
+\subsection{Objective alignment, calibration and selection}
+The benchmark establishes a three-step workflow: align the neural training
+objective with predictive correlation, restore phenotypic scale with a separate
+calibration step, and then evaluate the selection decision directly. The
+algebraic result is exact: minimizing standardized MSE maximizes Pearson
+correlation. Empirically, once all seven networks are evaluated on the same 101
+tasks and panels are equally weighted, Pearson training improves $r$ by about
+five thousandths. The cluster-bootstrap interval is positive, but an exact
+12-panel sign-flip test lies at the conventional threshold. The raw Pearson
+outputs pay a large scale penalty; validation-fitted affine calibration removes
+it while leaving the correlation gain essentially intact. NDCG changes are
+smaller still. Thus the benchmark identifies both what correlation-aligned
+training can deliver and what it cannot be assumed to deliver.
 
 Trait weighting matters. A trait-weighted analysis gives twice the
 panel-balanced effect because rice, pine and wheatG contribute many phenotypes.
@@ -20,9 +22,10 @@ avoid allowing heavily phenotyped resources to determine a cross-panel claim,
 and report both for transparency.
 
 \subsection{Architecture heterogeneity is suggestive, not universal}
-The Transformer repeatedly shows the largest positive estimate, including after
-loss-specific nested tuning. MLP gains are small, CNN is near zero after panel
-balance, and the DeepGS-inspired network becomes worse under Pearson training.
+Objective sensitivity may be architecture-dependent: the Transformer repeatedly
+shows the largest positive estimate, including after loss-specific nested tuning.
+MLP gains are small, CNN is near zero after panel balance, and the DeepGS-inspired
+network becomes worse under Pearson training.
 This counterexample rules out a universal optimization advantage. At the same
 time, the omnibus loss-by-architecture interaction is not significant, so the
 apparent ordering should be treated as hypothesis-generating rather than as a
@@ -91,7 +94,7 @@ limitations motivate stratified future benchmarks.
 
 Finally, the benchmark compares objective functions, not every possible neural
 architecture, and linear baselines remain strongest by mean rank. The practical
-recommendation is therefore conservative: try Pearson or CCC as a paired
-objective ablation when correlation is the operational endpoint; retain MSE and
-linear baselines; calibrate separately when phenotypic scale matters; and verify
-the actual trait-specific selection decision rather than inferring it from $r$.
+recommendation is therefore to use Pearson or CCC as paired objective-specific
+ablations when correlation is the operational endpoint; retain MSE and linear
+baselines; calibrate separately when phenotypic scale matters; and verify the
+actual trait-specific selection decision rather than inferring it from $r$.

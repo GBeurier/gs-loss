@@ -65,7 +65,9 @@ near-universal default, to minimize the mean squared error (MSE). But they are
 phenotypes --- the ``predictive ability'' reported in essentially every genomic
 prediction study \citep{crossa2010} --- and they are \emph{used} to rank
 candidates and select the best ones. There is therefore a systematic mismatch
-between the training objective and the objective that actually matters.
+between the training objective and one of the principal metrics used to evaluate
+genomic prediction. More importantly, neither MSE nor Pearson correlation is
+identical to the ranking problem ultimately faced in selection.
 \citet{waldmann2019} showed that selecting a model by $r$ can disagree with
 selecting it by MSE or $R^2$. \citet{ornella2014} argued that $r$ is a poor guide
 to performance in the tails of the distribution, where selection actually
@@ -86,8 +88,9 @@ by an affine recalibration applied after training.
 The empirical question therefore has a simple three-stage structure: compare
 the usual MSE-trained raw predictions with Pearson-trained raw predictions to
 measure correlation alignment, then calibrate the Pearson outputs on validation
-data to recover phenotypic scale. Figure~\ref{fig:loss} carries this structure
-through to the headline result.
+data to recover phenotypic scale, and finally ask whether either step changes
+the selected upper tail. Figure~\ref{fig:loss} carries this structure through to
+the headline result.
 
 \subsubsection{Contributions:}
 \begin{enumerate}
@@ -113,8 +116,8 @@ public and all code, splits and tuned configurations are released.
 
 \noindent We do not claim that a Pearson loss is uniformly superior to MSE; that
 would be false. We provide a principled, reproducible framework for training,
-calibrating and evaluating neural genomic predictors when the breeding objective
-is correlation and ranking rather than raw squared error.
+calibrating and evaluating neural genomic predictors by treating association,
+phenotypic scale and selection as related but distinct objectives.
 
 \section{Theory}\label{sec:theory}
 Throughout, $y,\hat y\in\mathbb{R}^n$, with sample means $\bar y,\bar{\hat y}$ and
@@ -313,7 +316,10 @@ phenotypic values matter. Across 101 tasks the average benefit was small,
 sensitive to panel weighting and not uniform across architectures. The
 Transformer gave the clearest descriptive signal, DeepGS a negative
 counterexample, and no neural loss displaced GBLUP or ridge on mean rank. The
-loss is therefore a principled objective to test, not a universal replacement.
+results nevertheless provide a practical framework for separating objective
+alignment, phenotypic calibration and decision-level evaluation in neural
+genomic prediction; Pearson or CCC should be viewed as objective-specific
+alternatives to test alongside MSE rather than as universal replacements.
 
 % Full-width figure floats (span both columns)
 
@@ -348,12 +354,13 @@ overlap is identical before and after (right).}
 \renewcommand{\familydefault}{\sfdefault}\normalfont
 \centering
 \includegraphics[width=\linewidth]{figures/fig4_loss_comparison.pdf}
-\caption{The central empirical comparison. Panels A--B show that raw Pearson
+\caption{The central empirical comparison. Panels A--C show that raw Pearson
 predictions gain $0.0048$ in correlation but increase normalized RMSE by
 $0.346$ relative to raw MSE; affine calibration retains the correlation gain
-($+0.0047$) and removes the scale penalty ($-0.0033$). Panel C reports estimates
-and 95\% panel-cluster bootstrap intervals for the pooled result and all seven
-architectures. Small points in A--B are contrasts for the 12 panels.}
+($+0.0047$) and removes the scale penalty ($-0.0033$), while raw NDCG@$10$
+changes by only $+0.0018$. Panel D reports estimates and 95\%
+panel-cluster bootstrap intervals for the pooled result and all seven
+architectures. Small points in A--C are contrasts for the 12 panels.}
 \label{fig:loss}
 \end{figure*}
 

@@ -8,10 +8,11 @@ and selection-aware evaluation,"** for consideration as an Investigation /
 Genomic Prediction article in *G3*.
 
 Genomic prediction models are trained almost universally by minimizing the mean
-squared error, yet they are evaluated — and used to make selection decisions —
-with the Pearson correlation between predicted and observed phenotypes and with
-the ranking of candidate genotypes. Our manuscript makes this training/evaluation
-mismatch explicit and resolvable, and contributes:
+squared error, yet they are evaluated with the Pearson correlation between
+predicted and observed phenotypes and used to rank candidate genotypes. Our
+manuscript separates three objectives that are often conflated in this workflow:
+association with phenotype, calibration to the phenotypic scale and recovery of
+selection candidates. It contributes:
 
 1. **A standardized-MSE Pearson loss.** We prove and numerically verify (to
    machine precision) that maximizing the Pearson correlation is exactly
@@ -33,8 +34,9 @@ and normalized-error changes are smaller. The Transformer has the clearest
 positive estimate, DeepGS is a negative counterexample, and the omnibus
 loss-by-architecture interaction is inconclusive. Nested tuning on CIMMYT wheat
 supports a Transformer signal but also exposes initialization variability. No
-neural loss unseats GBLUP or ridge on mean rank. We therefore provide an honest
-quantification of a plausible intervention rather than a universal-win claim.
+neural loss unseats GBLUP or ridge on mean rank. We therefore provide a
+reproducible framework for objective alignment, calibration and decision-level
+evaluation rather than a universal-win claim for any one loss.
 
 This work fits *G3*'s scope for computational tools and statistical methodology
 for genomic prediction. All benchmark datasets are public (EasyGeSe; the CIMMYT

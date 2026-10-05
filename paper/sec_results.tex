@@ -9,19 +9,20 @@ Pearson and concordance losses passed automatic gradient checks, and $-r$ and
 $1-r$ had identical gradients. These checks establish numerical equivalence,
 not empirical superiority.
 
-\subsection{Headline result: a small correlation gain, with scale restored by calibration}\label{sec:res-loss}
+\subsection{Headline result: association, calibration and selection separate}\label{sec:res-loss}
 
 \ifdefined\GTHREE\else
 \begin{figure}[tbp]\centering
 \IfFileExists{figures/fig4_loss_comparison.pdf}{\includegraphics[width=\linewidth]{figures/fig4_loss_comparison.pdf}}{}
-\caption{The paper's central comparison. Panels A--B compare the scale-aware
+\caption{The paper's central comparison. Panels A--C compare the scale-aware
 raw MSE baseline, the correlation-targeted but unscaled raw Pearson output, and
 the validation-fitted affine Pearson output. Small points are contrasts for each
 of 12 panels, open symbols are panel-balanced means, and bars are 95\%
 panel-cluster bootstrap intervals. Raw Pearson predictions gain $0.0048$ in $r$
 but lose $0.346$ in normalized RMSE; affine calibration retains a $0.0047$
-correlation gain and changes normalized RMSE by $-0.0033$. Panel C reports the
-Pearson-minus-MSE correlation contrast, interval and exact point estimate for
+correlation gain and changes normalized RMSE by $-0.0033$. The raw NDCG@$10$
+change is only $+0.0018$. Panel D reports the Pearson-minus-MSE correlation
+contrast, interval and exact point estimate for
 the pooled result and every neural architecture in the main benchmark. Folds
 were averaged within 101 tasks and architectures within task before panels were
 weighted equally.}
@@ -37,8 +38,8 @@ identify scale or offset. Validation-fitted affine calibration retained nearly
 all of the correlation gain ($+0.0047$) and brought normalized RMSE back to the
 MSE baseline ($-0.0033$, $[-0.0062,0.0000]$). Thus the headline is not that
 Pearson replaces MSE on every criterion: it slightly improves the target
-correlation, while a separate calibration step is needed for phenotypic-scale
-predictions.
+correlation, a separate calibration step is needed for phenotypic-scale
+predictions, and the decision-level effect must be checked directly.
 
 The final grid contained 90,900 rows: seven neural architectures, four losses,
 101 tasks, ten test folds and three calibration maps, plus GBLUP and ridge
@@ -53,7 +54,7 @@ instead produced $+0.0101$ ($[0.0028,0.0158]$), showing that the estimate is
 sensitive to the many traits contributed by rice, pine and wheatG.
 
 The hybrid and CCC losses gave panel-balanced $\Delta r$ values of $+0.0055$
-($[0.0010,0.0100]$) and $+0.0078$ ($[0.0022,0.0139]$), respectively. Figure~\ref{fig:loss}C
+($[0.0010,0.0100]$) and $+0.0078$ ($[0.0022,0.0139]$), respectively. Figure~\ref{fig:loss}D
 reports all seven architecture-specific Pearson contrasts and intervals. The
 Transformer has the largest positive estimate ($+0.0176$), while DeepGS is a
 negative counterexample ($-0.0067$); PNNGS and SoyDNGP are positive but
@@ -69,7 +70,10 @@ Pearson training changed panel-balanced raw NDCG@$10$ by only $+0.0018$
 ($+0.0034$, $[0.0015,0.0056]$). These quantities recover the highest observed
 phenotypes; because trait desirability was not harmonized, they must not be read
 as realized breeding gain for traits where lower values are preferred. Ridge
-and GBLUP retained the best mean ranks for both Pearson and NDCG@$10$.
+and GBLUP retained the best mean ranks for both Pearson and NDCG@$10$. The weak
+ranking response is therefore an empirical result in its own right: a measurable
+gain in global predictive ability did not substantially change which candidates
+would be recovered by the upper-tail rule used here.
 
 Affine-calibrated NRMSE, defined as RMSE divided by the test-fold phenotype
 standard deviation, was essentially unchanged by Pearson training
