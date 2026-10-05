@@ -1,5 +1,5 @@
 Neural genomic predictors are usually trained with mean squared error but
-evaluated by Pearson correlation and used for selection ranking. This study
+evaluated by Pearson correlation and used for selection ranking. For breeders and geneticists, this study
 shows that Pearson correlation can be optimized directly through an equivalent
 standardized-MSE loss, then evaluates what that alignment changes across 101
 public trait-dataset tasks. Pearson training modestly improves predictive

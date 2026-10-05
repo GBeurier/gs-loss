@@ -71,8 +71,9 @@ intervals are interpreted descriptively.
 The theoretical rank-preservation result requires a positive affine slope. The
 benchmark used unconstrained least squares fitted on validation predictions. Of
 7,014 Pearson-trained fold cells with finite raw and affine correlation, 12
-(0.17\%) changed sign. Raw predictions are therefore used for all correlation
-and upper-tail claims.
+(0.17\%) changed sign. Raw predictions are used for the primary correlation and upper-tail
+loss comparisons; the headline figure additionally audits raw versus affine
+correlation to assess retention of the gain.
 
 \input{supp/tabS_final_calibration.tex}
 
@@ -96,15 +97,22 @@ GBLUP rank first and second on average; neural-loss comparisons should therefore
 be understood as within-architecture improvements rather than superiority over
 linear genomic prediction.
 
+\begingroup\small
 \input{supp/tabS_final_ranks.tex}
+\endgroup
 
 \section{Figure source data and reproducibility}
-Every figure is exported as PDF, SVG and PNG. Machine-readable panel data are in
-\texttt{figures/source\_data/}. The primary analysis is regenerated with
-\texttt{python analysis/final\_analysis.py}, interaction models with
-\texttt{python analysis/mixed\_model\_final.py}, tables with
-\texttt{python analysis/make\_final\_supplement.py}, and figures with
-\texttt{python figures/make\_figures.py}. The main benchmark uses one neural
+Analysis and simulation scripts are provided in Supplementary File~2; figure
+source tables and text alternatives are provided in Supplementary File~3.
+Every main-text figure is exported as PDF, SVG and PNG. Machine-readable panel data are in
+\texttt{figures/source\_data/}. Reproduction commands are:
+\begin{itemize}
+\item Primary analysis: \texttt{python analysis/final\_analysis.py}
+\item Interaction models: \texttt{python analysis/mixed\_model\_final.py}
+\item Tables: \texttt{python analysis/make\_final\_supplement.py}
+\item Figures: \texttt{python figures/make\_figures.py}
+\end{itemize}
+The main benchmark uses one neural
 initialization per fold; only the wheat sensitivity quantifies three-seed
 variation.
 

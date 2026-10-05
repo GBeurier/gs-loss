@@ -1,0 +1,8 @@
+Frozen campaign: 90,900 unique rows; 101 tasks; 7 neural models; 4 losses; 10 folds x 3 calibrations per cell: PASS
+Nested sensitivity: 1,080 unique rows: PASS
+Recomputed raw Pearson panel-balanced contrast: 0.0047881838604094795 0.0007744765362990315 0.009134718869369946 0.05224609375
+Matches abstract (+0.0048, CI 0.0008–0.0091, p=0.052): PASS
+Missing correlations: 588
+pearson top mean ranks: ['ridge', 'gblup']
+ndcg@10 top mean ranks: ['ridge', 'gblup']
+Bibliographies match: PASS

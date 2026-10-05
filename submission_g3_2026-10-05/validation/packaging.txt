@@ -1,0 +1,16 @@
+{
+  "abstract_words_whitespace": 215,
+  "summary_words_whitespace": 100,
+  "running_title_characters": 36
+}
+Cover_letter.pdf: 16,691 bytes
+Figure 1.pdf: 35,169 bytes
+Figure 2.pdf: 23,947 bytes
+Figure 3.pdf: 22,528 bytes
+Figure 4.pdf: 38,053 bytes
+Figure 5.pdf: 15,035 bytes
+Figure 6.pdf: 17,411 bytes
+Manuscript_G3.pdf: 395,368 bytes
+Supplementary File 1.pdf: 149,898 bytes
+Supplementary File 2.zip: 93,690 bytes
+Supplementary File 3.zip: 760,341 bytes

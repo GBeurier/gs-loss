@@ -164,7 +164,8 @@ Correlation is invariant to strictly increasing affine transformations of $\hat
 y$: a model trained on $\mathcal{L}_{\mathrm{P}}$ controls the \emph{shape} of the
 prediction but not its scale or offset. This is corrected exactly and cheaply.
 \begin{proposition}\label{prop:2}
-Let $p\in\mathbb{R}^n$ be raw predictions and $r=r(y,p)$. The affine map
+Let $p\in\mathbb{R}^n$ be raw predictions, with $\sigma_y,\sigma_p>0$,
+and $r=r(y,p)$. The affine map
 $\tilde y = a\,p+b$ minimizing $\tfrac1n\sum_i (a p_i + b - y_i)^2$ has
 \[
 a^\star = \frac{\mathrm{cov}(y,p)}{\mathrm{var}(p)},\qquad
@@ -173,7 +174,7 @@ b^\star = \bar y - a^\star\,\bar p,\qquad
 \]
 If $a^\star>0$, the map is strictly increasing and hence preserves $r$, the
 Spearman correlation, and every top-$k$/ranking quantity, while setting the
-calibration slope to $1$ and intercept to $0$.
+calibration slope to $1$ and intercept to $0$ on the fitting sample.
 \end{proposition}
 \begin{proof}
 Ordinary least squares for a single predictor gives $a^\star,b^\star$ as stated;
@@ -377,12 +378,13 @@ All datasets are public: EasyGeSe (Zenodo, DOI \texttt{10.5281/zenodo.15348871})
 (\texttt{BGLR} R package \citep{perez2014bglr}) and SoyNAM (\texttt{SoyNAM} R package). Code, fixed
 cross-validation partitions, tuned configurations and a recorded runtime manifest are
 released as the \texttt{ccgp} package, with source at
-\url{https://github.com/GBeurier/gs-loss} (a versioned archive will be
-deposited at Zenodo, DOI to be assigned). All datasets used in the reported
-benchmark are public and download automatically. Supporting Information (File~S1,
-\texttt{supplement.pdf}) documents the architecture adaptations, complete paired
+\url{https://github.com/GBeurier/gs-loss}. All datasets used in the reported
+benchmark are public and download automatically. Supporting Information
+(Supplementary File~1) documents the architecture adaptations, complete paired
 contrasts, missingness, HPO provenance, calibration, mean ranks and nested wheat
-sensitivity. Machine-readable source tables accompany every data-driven figure.
+sensitivity. Analysis and simulation code is provided in Supplementary File~2,
+and machine-readable figure source tables and text alternatives are provided in
+Supplementary File~3.
 
 \section*{Acknowledgments}
 The authors acknowledge the partners of the Bana+ project for their contribution
@@ -394,6 +396,18 @@ and the SoyNAM project investigators and package developers
 \citep{xavier2016soynam}. The authors also acknowledge the symbolic and
 institutional support of the collective research initiative Camille No\^us
 (Laboratoire Cogitamus).
+
+During preparation of this manuscript, the authors used Anthropic Claude and OpenAI Codex (GPT-6 for the final submission preparation) to assist with code review, implementation checks, repository organization, benchmark aggregation scripts, LaTeX editing and language revision. All numerical results, references, code and manuscript content were reviewed and verified by the authors, who take full responsibility for the final content of the article.
+
+
+\section*{Author contributions}
+Grégory Beurier: Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Validation, Visualization, Writing --- original draft, Writing --- review \& editing, Project administration.
+Denis Cornet: Methodology, Supervision, Validation, Writing --- review \& editing.
+Lauriane Rouan: Methodology, Validation, Writing --- review \& editing.
+David Cros: Conceptualization, Methodology, Supervision, Validation, Writing --- review \& editing.
+
+\section*{Conflicts of interest}
+The authors declare no competing interests.
 
 \section*{Study funding}
 This work was supported by the Bana+ project, funded by the French Ministry of

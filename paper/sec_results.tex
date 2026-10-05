@@ -103,9 +103,9 @@ calibration and the median calibration slope moved from 0.918 to 0.957. These
 raw-unit averages are descriptive only. A positive affine map preserves ranks,
 but the implementation used the unconstrained least-squares slope estimated on
 validation data. Among 7,014 comparable fold cells, 12 (0.17\%) therefore
-reversed the sign of test correlation. All correlation and upper-tail claims in
-this paper consequently use raw predictions; affine predictions are used only
-for error and calibration outcomes.
+reversed the sign of test correlation. Loss comparisons for correlation and upper-tail recovery use raw predictions.
+Figure~\ref{fig:loss} additionally audits raw versus affine correlation to check
+that calibration retains the gain. Scale outcomes use affine predictions.
 
 \subsection{Loss-specific HPO and seed sensitivity}\label{sec:res-nested}
 

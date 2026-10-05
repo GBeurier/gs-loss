@@ -1,0 +1,4 @@
+Grégory Beurier: Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Validation, Visualization, Writing – original draft, Writing – review & editing, Project administration.
+Denis Cornet: Methodology, Supervision, Validation, Writing – review & editing.
+Lauriane Rouan: Methodology, Validation, Writing – review & editing.
+David Cros: Conceptualization, Methodology, Supervision, Validation, Writing – review & editing.

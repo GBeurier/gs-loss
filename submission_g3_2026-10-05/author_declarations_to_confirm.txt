@@ -1,0 +1,24 @@
+DERNIERS CHAMPS PERSONNELS AVANT « SUBMIT »
+
+Renseignés selon les indications de Grégory : emails CIRAD, contributions,
+absence de préprint et de conflits d'intérêts, paragraphe IA repris d'AOM et
+adapté à G3/OUP. David Cros reste dernier auteur ; Camille Noûs est remercié.
+
+À renseigner dans le portail si demandé : ORCID, numéro de convention Bana+,
+éventuels reviewers proposés/exclus, paiement ou accord institutionnel.
+Vérifier l'accord final des quatre auteurs et l'absence de soumission concurrente
+avant de signer les attestations de la lettre et du portail.
+
+La déclaration IA décrit Claude et Codex, sur la base du paragraphe AOM demandé
+par l'auteur et des workflows conservés ici. GPT-6 correspond à la préparation
+finale actuelle ; les modèles/versions des usages antérieurs ne sont pas
+entièrement enregistrés dans ce dépôt. Les compléter si disponibles dans vos
+historiques. Ne pas attribuer un numéro de version à Claude sans source.
+
+Aucun DOI de notre archive logicielle n'est confirmé. Le DOI EasyGeSe est celui
+d'un dataset tiers. L'archive des sources est prête dans source/. Un dépôt
+Zenodo/figshare pérenne peut être ajouté avant publication.
+
+Après une modification dans paper/, reconstruire depuis la racine avec :
+python3 scripts/prepare_g3_submission.py
+Puis contrôler le PDF et recopier les textes actualisés du formulaire.

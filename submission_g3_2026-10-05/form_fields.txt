@@ -1,0 +1,127 @@
+G3 — CHAMPS À COPIER-COLLER
+Préparation : 5 octobre 2026. Interface privée non consultée : l'ordre et les noms
+exacts des champs peuvent varier. Copier uniquement le contenu après les libellés.
+
+ARTICLE TYPE
+Investigation
+
+SUBJECT / SECTION (si proposé dans le menu)
+Genomic Selection / Genomic Prediction (choisir le libellé disponible)
+
+TITLE
+Metric-consistent neural networks for genomic prediction and selection: a standardized-MSE Pearson loss, affine calibration, and selection-aware evaluation
+
+RUNNING TITLE
+Metric-consistent genomic prediction
+
+ABSTRACT
+Voir abstract.txt (texte complet, identique au manuscrit).
+
+ARTICLE SUMMARY
+Voir article_summary.txt (100 mots, identique à paper/g3/article_summary.md).
+
+KEYWORDS
+Genomic prediction; genomic selection; deep learning; loss functions; calibration
+
+AUTHOR ORDER
+1. Grégory Beurier — corresponding author
+   Given name: Grégory | Family name: Beurier
+   Email: gregory.beurier@cirad.fr
+   ORCID: À COMPLÉTER dans le compte, si demandé
+2. Denis Cornet
+   Given name: Denis | Family name: Cornet
+   Email: denis.cornet@cirad.fr
+   ORCID: À COMPLÉTER si demandé
+3. Lauriane Rouan
+   Given name: Lauriane | Family name: Rouan
+   Email: lauriane.rouan@cirad.fr
+   ORCID: À COMPLÉTER si demandé
+4. David Cros
+   Given name: David | Family name: Cros
+   Email: david.cros@cirad.fr
+   ORCID: À COMPLÉTER si demandé
+
+AFFILIATIONS — les deux pour chacun des quatre auteurs
+1. CIRAD, UMR AGAP Institut, Avenue Agropolis, 34398 Montpellier Cedex 5, France
+2. UMR AGAP Institut, Univ Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France
+Adresse postale de correspondance : Avenue Agropolis, 34398 Montpellier Cedex 5, France.
+Pour un champ adresse de l'affiliation 2, confirmer l'adresse institutionnelle.
+Camille Noûs (Laboratoire Cogitamus) figure dans les remerciements, pas dans la liste des auteurs.
+
+DATA AVAILABILITY STATEMENT
+All benchmark datasets are public: EasyGeSe (https://doi.org/10.5281/zenodo.15348871), the CIMMYT wheat panel distributed with the BGLR R package, and the SoyNAM population distributed with the SoyNAM R package. Source code, frozen benchmark results, cross-validation definitions, selected configurations, and a recorded runtime manifest are available at https://github.com/GBeurier/gs-loss. Supplementary File 1 documents the architecture adaptations, paired contrasts, missingness, calibration, method ranks, and nested-tuning sensitivity. Analysis and simulation code is provided in Supplementary File 2; machine-readable figure and analysis tables and text alternatives are provided in Supplementary File 3.
+
+CODE AVAILABILITY URL
+https://github.com/GBeurier/gs-loss
+
+DATASET DOI (EasyGeSe ; ce n'est PAS le DOI de notre logiciel ni du manuscrit)
+10.5281/zenodo.15348871
+
+SOFTWARE / RESULTS ARCHIVE DOI
+Aucun DOI confirmé dans le dépôt. Ne pas saisir le DOI EasyGeSe ici.
+Un DOI de l'archive logicielle n'est pas inventé. Si déjà réservé, le fournir.
+
+FUNDING STATEMENT
+This work was supported by the Bana+ project, funded by the French Ministry of Agriculture under the PARSADA programme.
+Funder: French Ministry of Agriculture
+Programme: PARSADA
+Project: Bana+
+Grant number / recipients: À COMPLÉTER si applicable ; non documentés dans le dépôt.
+Vérifier le libellé du bailleur proposé par le registre du formulaire.
+
+CONFLICT OF INTEREST STATEMENT — confirmé par l'auteur
+The authors declare no competing interests.
+
+AI DISCLOSURE — adapté du paragraphe AOM, fourni par l'auteur
+During preparation of this manuscript, the authors used Anthropic Claude and OpenAI Codex (GPT-6 for the final submission preparation) to assist with code review, implementation checks, repository organization, benchmark aggregation scripts, LaTeX editing and language revision. All numerical results, references, code and manuscript content were reviewed and verified by the authors, who take full responsibility for the final content of the article.
+
+AUTHOR CONTRIBUTIONS / CRediT — selon les indications de Grégory
+Grégory Beurier: Conceptualization, Methodology, Software, Formal analysis, Investigation, Data curation, Validation, Visualization, Writing – original draft, Writing – review & editing, Project administration.
+Denis Cornet: Methodology, Supervision, Validation, Writing – review & editing.
+Lauriane Rouan: Methodology, Validation, Writing – review & editing.
+David Cros: Conceptualization, Methodology, Supervision, Validation, Writing – review & editing.
+
+SUGGESTED REVIEWERS
+Aucun nom confirmé. Si demandé : nom, institution, e-mail vérifié et expertise,
+avec vérification de l'absence de collaboration récente ou conflit.
+
+EXCLUDED REVIEWERS / REASONS
+Aucun nom confirmé. Laisser vide si aucune exclusion souhaitée.
+
+EDITOR SUGGESTION
+Aucune préférence confirmée. Laisser le choix à la revue si le champ est facultatif.
+
+COVER LETTER
+Copier cover_letter.txt, ou téléverser upload/Cover_letter.pdf.
+
+FILE DESCRIPTIONS
+Manuscript_G3.pdf: Main manuscript with line and page numbers, Figures 1–6, Table 1, and references.
+Supplementary File 1.pdf: Supporting Information: architecture adaptations, statistical comparisons, calibration audit, nested-tuning sensitivity, and method ranks.
+Supplementary File 2.zip: Analysis and simulation code, package source, experiment drivers, installation metadata, and reproduction instructions.
+Supplementary File 3.zip: Machine-readable figure and analysis tables, with text alternatives for Figures 1–6.
+Figure 1.pdf: Geometry of the standardized-MSE/Pearson identity.
+Figure 2.pdf: Affine calibration in a controlled simulation.
+Figure 3.pdf: Public benchmark dataset map.
+Figure 4.pdf: Correlation, phenotypic scale, upper-tail recovery, and architecture contrasts.
+Figure 5.pdf: Validation-fitted calibration and sign-reversal audit.
+Figure 6.pdf: Shared versus loss-specific tuning and initialization sensitivity.
+
+PREPRINT / PRIOR SUBMISSION / RELATED MANUSCRIPTS
+No preprint has been posted for this manuscript.
+Si question sur un précédent journal : aucun précédent journal documenté ;
+confirmer la réponse au moment de soumettre.
+Les rapports de paper/internal_review_summary.md sont des relectures internes
+simulées, pas des reviews externes à transférer ni une approbation de G3.
+
+ETHICS / THIRD-PARTY PERMISSIONS (si demandé)
+Secondary computational analysis of publicly available datasets; no new experimental data collection is reported.
+Confirmer les déclarations éthiques requises par le formulaire et les conditions
+des datasets ; ne pas inventer de numéro d'autorisation.
+
+DATABASE LINKING (FlyBase, PomBase, SGD, WormBase)
+No such linkable entities are reported in this manuscript.
+
+OPEN ACCESS / LICENSE / FEES
+Choix à faire dans le portail par l'auteur. Ne pas confondre la licence MIT du
+code avec la licence de publication de l'article. Vérifier l'éligibilité CIRAD
+à une prise en charge institutionnelle avant de sélectionner le paiement.

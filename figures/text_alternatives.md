@@ -27,7 +27,9 @@ unidentified. Validation-fitted affine calibration retains a 0.0047 correlation
 gain and changes normalized RMSE by -0.0033, effectively restoring the MSE
 baseline. Small points show the 12 individual panel contrasts; uncertainty bars
 are 95% panel-cluster bootstrap intervals. The architecture panel includes all
-seven neural networks. Pearson-minus-MSE correlation contrasts range from
+seven neural networks. Panel C shows that raw NDCG at the top 10% changes
+by only +0.0018 (95% panel-cluster bootstrap interval -0.0001 to +0.0035).
+Pearson-minus-MSE correlation contrasts range from
 -0.0067 for DeepGS to +0.0176 for Transformer; PNNGS is +0.0096, SoyDNGP
 +0.0056, MLP +0.0044, DNNGP +0.0022 and CNN +0.0008. The global interaction is
 inconclusive (`p=0.414`).

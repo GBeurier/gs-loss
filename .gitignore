@@ -42,3 +42,6 @@ paper/_wf_*.tex
 # internal planning / AI task prompt (not part of the deliverable)
 Instructions.txt
 Overview.md
+
+# Portable copy of the submission folder (regenerated locally)
+/submission_g3_*.zip

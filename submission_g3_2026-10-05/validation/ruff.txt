@@ -1,0 +1,74 @@
+analysis/analyze.py:6:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/analyze.py:11:17: F401 [*] `numpy` imported but unused
+analysis/analyze.py:69:16: BLE001 Do not catch blind exception: `Exception`
+analysis/final_analysis.py:21:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/final_analysis.py:142:9: PLC0206 Extracting value from dictionary without calling `.items()`
+analysis/make_final_supplement.py:2:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/make_repro_manifest.py:2:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/make_supplement.py:11:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/make_supplement.py:22:40: F401 [*] `ccgp.stats.mean_ranks` imported but unused
+analysis/make_supplement.py:154:23: UP031 Use format specifiers instead of percent format
+analysis/make_supplement.py:298:5: F841 Local variable `fm` is assigned to but never used
+analysis/mixed_model_final.py:8:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/mixed_model_final.py:28:14: C408 Unnecessary `dict()` call (rewrite as a literal)
+analysis/reanalyze_p1.py:14:1: I001 [*] Import block is un-sorted or un-formatted
+analysis/reanalyze_p1.py:18:17: F401 [*] `numpy` imported but unused
+ccgp/calibration.py:25:52: UP037 [*] Remove quotes from type annotation
+ccgp/calibration.py:40:57: UP037 [*] Remove quotes from type annotation
+ccgp/calibration.py:80:57: UP037 [*] Remove quotes from type annotation
+ccgp/calibration.py:102:52: UP037 [*] Remove quotes from type annotation
+ccgp/cli.py:9:8: F401 [*] `json` imported but unused
+ccgp/data.py:117:13: FURB122 [*] Use of `f.write` in a for loop
+ccgp/experiment.py:70:11: RUF059 Unpacked variable `ids` is never used
+ccgp/experiment.py:80:28: RUF046 [*] Value being cast to `int` is already an integer
+ccgp/experiment.py:80:58: RUF046 [*] Value being cast to `int` is already an integer
+ccgp/experiment.py:116:28: RUF046 [*] Value being cast to `int` is already an integer
+ccgp/experiment.py:116:58: RUF046 [*] Value being cast to `int` is already an integer
+ccgp/hpo.py:109:16: BLE001 Do not catch blind exception: `Exception`
+ccgp/metrics.py:232:15: RUF046 Value being cast to `int` is already an integer
+ccgp/models/__init__.py:5:11: RUF022 [*] `__all__` is not sorted
+ccgp/models/classical.py:28:5: S110 `try`-`except`-`pass` detected, consider logging the exception
+ccgp/models/classical.py:28:12: BLE001 Do not catch blind exception: `Exception`
+ccgp/models/classical.py:48:52: UP037 [*] Remove quotes from type annotation
+ccgp/models/classical.py:99:16: C408 Unnecessary `dict()` call (rewrite as a literal)
+ccgp/models/neural.py:13:1: I001 [*] Import block is un-sorted or un-formatted
+ccgp/models/neural.py:19:8: PLR0402 [*] Use `from torch import nn` in lieu of alias
+ccgp/models/neural.py:191:9: RUF059 Unpacked variable `n` is never used
+ccgp/models/neural.py:191:12: RUF059 Unpacked variable `c` is never used
+ccgp/selgenpalm.py:15:1: I001 [*] Import block is un-sorted or un-formatted
+ccgp/stats.py:65:12: BLE001 Do not catch blind exception: `Exception`
+ccgp/stats.py:80:20: BLE001 Do not catch blind exception: `Exception`
+experiments/fill_transformer.py:13:1: I001 [*] Import block is un-sorted or un-formatted
+experiments/fill_transformer.py:21:21: F401 [*] `pathlib.Path` imported but unused
+experiments/run.py:14:1: I001 [*] Import block is un-sorted or un-formatted
+experiments/run.py:32:17: F401 [*] `numpy` imported but unused
+experiments/run.py:173:16: BLE001 Do not catch blind exception: `Exception`
+experiments/run.py:203:27: RUF059 Unpacked variable `hpo` is never used
+experiments/run.py:262:5: I001 [*] Import block is un-sorted or un-formatted
+experiments/run.py:359:9: RUF059 Unpacked variable `X` is never used
+experiments/run.py:359:15: RUF059 Unpacked variable `ids` is never used
+experiments/run_litnn.py:18:1: I001 [*] Import block is un-sorted or un-formatted
+experiments/run_litnn_subset.py:10:1: I001 [*] Import block is un-sorted or un-formatted
+experiments/run_litnn_subset.py:13:27: F401 [*] `multiprocessing` imported but unused
+experiments/run_litnn_subset.py:16:32: F401 [*] `concurrent.futures.ProcessPoolExecutor` imported but unused
+experiments/run_litnn_subset.py:16:53: F401 [*] `concurrent.futures.as_completed` imported but unused
+experiments/run_litnn_subset.py:18:21: F401 [*] `pathlib.Path` imported but unused
+experiments/run_loss_specific_hpo.py:16:8: F401 [*] `os` imported but unused
+experiments/run_loss_specific_hpo.py:18:25: F401 [*] `dataclasses.asdict` imported but unused
+experiments/run_loss_specific_hpo.py:93:16: BLE001 Do not catch blind exception: `Exception`
+experiments/run_selgenpalm.py:36:22: F401 [*] `ccgp.hpo.NN_ARCHS` imported but unused
+experiments/run_selgenpalm.py:144:20: BLE001 Do not catch blind exception: `Exception`
+scripts/run_pinepig.py:10:1: I001 [*] Import block is un-sorted or un-formatted
+scripts/run_pinepig.py:14:17: SIM115 Use a context manager for opening files
+scripts/smoke.py:4:17: F401 [*] `numpy` imported but unused
+scripts/smoke.py:39:18: C408 Unnecessary `dict()` call (rewrite as a literal)
+scripts/smoke.py:40:35: C408 Unnecessary `dict()` call (rewrite as a literal)
+scripts/sorghum_trial.py:35:10: C408 Unnecessary `dict()` call (rewrite as a literal)
+scripts/sorghum_trial.py:36:27: C408 Unnecessary `dict()` call (rewrite as a literal)
+scripts/sorghum_trial.py:39:9: RUF059 Unpacked variable `X` is never used
+scripts/sorghum_trial.py:39:15: RUF059 Unpacked variable `ids` is never used
+tests/test_core.py:2:1: I001 [*] Import block is un-sorted or un-formatted
+tests/test_core.py:6:49: F401 [*] `ccgp.calibration.IsotonicCalibrator` imported but unused
+tests/test_core.py:7:57: F401 [*] `ccgp.calibration.RawCalibrator` imported but unused
+Found 72 errors.
+[*] 44 fixable with the `--fix` option (17 hidden fixes can be enabled with the `--unsafe-fixes` option).
