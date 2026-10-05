@@ -55,5 +55,5 @@ Thank you for considering our work.
 
 Sincerely,
 
-Grégory Beurier, on behalf of all authors (G. Beurier, D. Cornet, L. Rouan, D. Cros)
+Grégory Beurier, on behalf of all authors (G. Beurier, D. Cornet, L. Rouan, C. Noûs, D. Cros)
 CIRAD, UMR AGAP Institut, Montpellier, France · gregory.beurier@cirad.fr
